@@ -1,65 +1,22 @@
-﻿<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#ff7900" />
-  <title>On-Call | Employee Dashboard</title>
-  <meta name="description" content="Find emergency contacts and manage your on-call duties." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <aside class="sidebar">
-    <div class="brand"><span class="brand-mark">O</span><span>On-Call</span></div>
-    <nav aria-label="Employee navigation"><a class="nav-item active" style="text-decoration:none" href="employee.html"><span>⌂</span> Employee dashboard</a></nav>
-    <div class="sidebar-bottom">
-      <button class="nav-item"><span>?</span> Help & support</button>
-      <div class="signed-in"><span class="avatar small">AM</span><div><strong>Ahmed Mohamed</strong><small>Enterprise Solutions</small></div><span>⋮</span></div>
-    </div>
-  </aside>
-  <main>
-    <header class="topbar">
-      <button class="mobile-menu" aria-label="Open navigation">☰</button>
-      <div><span class="live-dot"></span><span class="coverage-label">Emergency coverage active</span></div>
-      <div class="top-actions"><button class="icon-btn" aria-label="Notifications">♧<span class="notification-dot"></span></button><span class="time" id="currentTime"></span></div>
-    </header>
-    <section class="page active">
-      <div class="page-heading">
-        <div><p class="eyebrow">EMERGENCY SUPPORT</p><h1>Who is on-call now?</h1><p>Find the right person in seconds when an urgent issue happens.</p></div>
-        <button class="secondary-btn" id="findTeamBtn">⌕ Find any team</button>
-      </div>
-      <div class="alert-strip"><span class="pulse"></span><strong>Outside working hours</strong><span>On-call contacts are currently active for emergency support.</span><span class="strip-time">Coverage until 8:00 AM</span></div>
-      <div class="content-grid">
-        <div class="primary-column">
-          <section class="panel">
-            <div class="panel-head split"><div><h2>Emergency contacts</h2><p>Your preferred teams · updated live</p></div><div class="segmented"><button class="active" data-view="now">On-call now</button><button data-view="week">Next 7 days</button></div></div>
-            <div class="search-row"><label class="search"><span>⌕</span><input id="contactSearch" placeholder="Search preferred teams..." /></label><button class="filter-btn">All departments⌄</button></div>
-            <div id="nowView" class="contacts-list"></div><div id="weekView" class="schedule-wrap hidden"></div>
-          </section>
-          <section class="panel preferred-panel">
-            <div class="panel-head split"><div><h2>My preferred teams</h2><p>Quick access to teams you work with most</p></div><button class="primary-btn" id="addTeamBtn">+ Add preferred team</button></div>
-            <div class="chips" id="preferredChips"></div>
-          </section>
-        </div>
-        <aside class="right-column">
-          <section class="panel my-oncall">
-            <div class="panel-head"><p class="eyebrow">MY ON-CALL</p><h2>Your next duty</h2></div>
-            <div class="date-block"><div class="date-card"><strong>09</strong><span>SEP</span></div><div><strong>Wednesday</strong><span>Today · 6:00 PM – 8:00 AM</span></div></div>
-            <div class="duty-team"><span class="team-icon dark">E</span><div><small>TEAM</small><strong>ERP Applications</strong></div></div>
-            <button class="primary-btn full" id="swapBtn">⇄ Swap on-call</button>
-            <div class="upcoming"><span>UPCOMING</span><div><strong>14 Sep</strong><small>ERP Applications</small></div><div><strong>18 Sep</strong><small>ERP Applications</small></div></div>
-          </section>
-          <section class="support-note"><span>!</span><div><strong>Critical emergency?</strong><p>If you cannot reach the on-call employee, contact the Service Desk escalation line.</p><a href="tel:16000">Call Service Desk →</a></div></section>
-        </aside>
-      </div>
-    </section>
-  </main>
-  <div class="modal-backdrop hidden" id="teamModal"><div class="modal"><button class="close-modal" aria-label="Close">×</button><p class="eyebrow">TEAM DIRECTORY</p><h2>Add preferred team</h2><p>Search by team name, department, or business area.</p><label class="search modal-search"><span>⌕</span><input id="teamSearch" autofocus placeholder="Search team..." /></label><div class="modal-filters"><button class="filter-btn">All departments⌄</button><button class="filter-btn">All business areas⌄</button></div><div id="teamResults" class="team-results"></div></div></div>
-  <div class="modal-backdrop hidden" id="swapModal"><div class="modal swap-modal"><button class="close-modal" aria-label="Close">×</button><p class="eyebrow">ERP APPLICATIONS</p><h2>Swap your on-call duty</h2><div class="current-duty"><span>Your current duty</span><strong>Wednesday, 9 September</strong></div><label class="field-label" for="swapSelect">Swap with</label><select id="swapSelect"><option value="Mohamed Hassan|Thursday, 10 September">Mohamed Hassan — Thu, 10 Sep</option><option value="Sara Ibrahim|Friday, 11 September">Sara Ibrahim — Fri, 11 Sep</option><option value="Omar Khalil|Sunday, 13 September">Omar Khalil — Sun, 13 Sep</option></select><div class="swap-preview" id="swapPreview"></div><div class="warning">! This change immediately updates both schedules. No approval from the other employee is required.</div><button class="primary-btn full" id="confirmSwap">Confirm swap</button></div></div>
-  <div class="toast hidden" id="toast">✓ On-call duty swapped successfully</div>
-  <script src="employee.js"></script>
-</body>
-</html>
+﻿const contacts=[
+ {team:'ERP Applications',area:'Enterprise Systems',name:'Ahmed Mohamed',phone:'+20 12 1000 4521',email:'ahmed.mohamed@company.com',initials:'AM'},
+ {team:'Integration',area:'Digital Platforms',name:'Omar Hassan',phone:'+20 12 1834 0192',email:'omar.hassan@company.com',initials:'OH'},
+ {team:'Database',area:'Infrastructure',name:'Mahmoud Ali',phone:'+20 10 7723 8841',email:'mahmoud.ali@company.com',initials:'MA'},
+ {team:'Infrastructure',area:'Technology Operations',name:'Mostafa Ahmed',phone:'+20 11 0298 3317',email:'mostafa.ahmed@company.com',initials:'MA'},
+ {team:'Network',area:'Technology Operations',name:'Sara Ibrahim',phone:'+20 12 4431 7655',email:'sara.ibrahim@company.com',initials:'SI'}
+];
+let preferred=contacts.map(x=>x.team);
+const allTeams=[{name:'CRM',area:'Customer Platforms'},{name:'Billing',area:'Revenue Management'},{name:'Revenue Assurance',area:'Revenue Management'},{name:'Fraud Management',area:'Enterprise Systems'},{name:'Security Operations',area:'Cyber Security'},{name:'Data Warehouse',area:'Data & Analytics'},{name:'Data Analytics',area:'Data & Analytics'},{name:'Data Integration',area:'Data & Analytics'},...contacts.map(x=>({name:x.team,area:x.area}))];
+const people=['Ahmed','Mohamed','Sara','Ahmed','Omar','Mohamed','Sara'];
+const esc=s=>s.replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+function renderContacts(filter=''){const data=contacts.filter(x=>preferred.includes(x.team)&&x.team.toLowerCase().includes(filter.toLowerCase()));document.querySelector('#nowView').innerHTML=data.length?data.map(x=>`<article class="contact-card"><div class="team-identity"><span class="team-icon">${esc(x.team[0])}</span><div><strong>${esc(x.team)}</strong><span>${esc(x.area)}</span></div></div><div class="person"><span class="avatar">${x.initials}</span><div class="person-meta"><strong>${esc(x.name)}</strong><small>${esc(x.phone)} · ${esc(x.email)}</small></div></div><div class="contact-actions"><a class="call-btn" href="tel:${x.phone.replace(/ /g,'')}">☎ Call</a><a class="mail-btn" href="mailto:${x.email}">Email</a></div></article>`).join(''):'<div style="padding:30px;text-align:center;color:#777">No preferred teams match your search.</div>'}
+function renderChips(){document.querySelector('#preferredChips').innerHTML=preferred.map(x=>`<span class="chip">${esc(x)}<button data-remove="${esc(x)}" aria-label="Remove ${esc(x)}">×</button></span>`).join('')}
+function renderWeek(){const days=['Wed 10','Thu 11','Fri 12','Sat 13','Sun 14','Mon 15','Tue 16'];document.querySelector('#weekView').innerHTML=`<table><thead><tr><th>Team</th>${days.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${preferred.map((t,j)=>`<tr><td><strong>${esc(t)}</strong></td>${days.map((_,i)=>`<td>${people[(i+j)%people.length]}</td>`).join('')}</tr>`).join('')}</tbody></table>`}
+function renderTeamResults(q=''){const matches=allTeams.filter(x=>x.name.toLowerCase().includes(q.toLowerCase())).filter(x=>!preferred.includes(x.name)).slice(0,6);document.querySelector('#teamResults').innerHTML=matches.length?matches.map(x=>`<div class="team-result"><div><strong>${esc(x.name)}</strong><small>${esc(x.area)}</small></div><button class="add-link" data-add="${esc(x.name)}">+ Add</button></div>`).join(''):'<div style="padding:25px 0;color:#777;text-align:center">No matching teams found.</div>'}
+function openModal(id){document.querySelector(id).classList.remove('hidden')}function closeModals(){document.querySelectorAll('.modal-backdrop').forEach(x=>x.classList.add('hidden'))}
+function swapPreview(){const [name,date]=document.querySelector('#swapSelect').value.split('|');document.querySelector('#swapPreview').innerHTML=`<div class="swap-state"><b>BEFORE</b><span>You → Wed, 9 Sep</span><span>${name} → ${date.split(', ')[1]}</span></div><div class="swap-state"><b>AFTER</b><span>${name} → Wed, 9 Sep</span><span>You → ${date.split(', ')[1]}</span></div>`}
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-view]').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelector('#nowView').classList.toggle('hidden',b.dataset.view!=='now');document.querySelector('#weekView').classList.toggle('hidden',b.dataset.view!=='week');renderWeek()});
+document.querySelector('#contactSearch').oninput=e=>renderContacts(e.target.value);document.querySelector('#preferredChips').onclick=e=>{if(e.target.dataset.remove){preferred=preferred.filter(x=>x!==e.target.dataset.remove);renderChips();renderContacts();renderWeek()}};document.querySelector('#teamResults').onclick=e=>{if(e.target.dataset.add){preferred.push(e.target.dataset.add);renderChips();renderContacts();renderTeamResults(document.querySelector('#teamSearch').value)}};document.querySelector('#teamSearch').oninput=e=>renderTeamResults(e.target.value);
+document.querySelector('#addTeamBtn').onclick=()=>{openModal('#teamModal');renderTeamResults()};document.querySelector('#findTeamBtn').onclick=()=>{openModal('#teamModal');renderTeamResults()};document.querySelector('#swapBtn').onclick=()=>{openModal('#swapModal');swapPreview()};document.querySelector('#swapSelect').onchange=swapPreview;document.querySelectorAll('.close-modal').forEach(x=>x.onclick=closeModals);document.querySelectorAll('.modal-backdrop').forEach(x=>x.onclick=e=>{if(e.target===x)closeModals()});document.querySelector('#confirmSwap').onclick=()=>{closeModals();const t=document.querySelector('#toast');t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3000)};document.querySelector('.mobile-menu').onclick=()=>document.querySelector('.sidebar').classList.toggle('open');
+function tick(){document.querySelector('#currentTime').textContent=new Intl.DateTimeFormat('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}).format(new Date())}tick();setInterval(tick,60000);renderContacts();renderChips();renderWeek();
+//aliiiiii
