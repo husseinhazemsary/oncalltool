@@ -10,14 +10,4 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="wwwroot\admin\admin.html" />
-    <None Include="wwwroot\admin\js\manager.js" />
-    <None Include="wwwroot\admin\managerr.html" />
-    <None Include="wwwroot\employee\employee.html" />
-    <None Include="wwwroot\employee\js\emp.js" />
-    <None Include="wwwroot\shared\data.js" />
-    <None Include="wwwroot\shared\styles.css" />
-  </ItemGroup>
-
 </Project>

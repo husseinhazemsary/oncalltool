@@ -1,40 +1,424 @@
 ﻿<!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#ff7900" />
-  <title>On-Call | Admin Dashboard</title>
-  <meta name="description" content="Monitor emergency support coverage across all company teams." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+
+    <meta charset="UTF-8" />
+
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1" />
+
+    <meta name="theme-color"
+          content="#ff7900" />
+
+    <title>
+        On-Call | Manager
+    </title>
+
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+
+
+    <link rel="stylesheet"
+          href="../shared/styles.css" />
+
 </head>
+
+
 <body>
-  <aside class="sidebar">
-    <div class="brand"><span class="brand-mark">O</span><span>On-Call</span></div>
-    <nav aria-label="Admin navigation"><a class="nav-item active" style="text-decoration:none" href="admin.html"><span>▦</span> Admin dashboard</a></nav>
-    <div class="sidebar-bottom"><button class="nav-item"><span>?</span> Help & support</button><div class="signed-in"><span class="avatar small">AD</span><div><strong>System Admin</strong><small>Operations Control</small></div><span>⋮</span></div></div>
-  </aside>
-  <main>
-    <header class="topbar"><button class="mobile-menu" aria-label="Open navigation">☰</button><div><span class="live-dot"></span><span class="coverage-label">Emergency coverage active</span></div><div class="top-actions"><button class="icon-btn" aria-label="Notifications">♧<span class="notification-dot"></span></button><span class="time" id="currentTime"></span></div></header>
-    <section class="page active">
-      <div class="page-heading"><div><p class="eyebrow">OPERATIONS CONTROL</p><h1>Coverage overview</h1><p>Monitor emergency support readiness across all company teams.</p></div><button class="primary-btn">↥ Upload schedule</button></div>
-      <div class="stats">
-        <article><span>Total teams</span><strong>48</strong><small>Across 8 departments</small></article>
-        <article><span>Complete schedules</span><strong>42</strong><small class="positive">↑ 4 from last week</small></article>
-        <article><span>Missing coverage</span><strong class="orange-text">5</strong><small>Needs manager action</small></article>
-        <article><span>No schedule</span><strong class="red-text">1</strong><small>Security Operations</small></article>
-        <article><span>Swaps this week</span><strong>12</strong><small>All recorded</small></article>
-      </div>
-      <section class="panel admin-table-panel">
-        <div class="panel-head split"><div><h2>7-day team coverage</h2><p>10–16 September 2026</p></div><button class="secondary-btn">Export report</button></div>
-        <div class="admin-filters"><label class="search"><span>⌕</span><input id="adminSearch" placeholder="Search teams or managers..." /></label><button class="filter-btn">All statuses⌄</button><button class="filter-btn">All departments⌄</button></div>
-        <div class="table-scroll"><table><thead><tr><th>Team</th><th>Status</th><th>Wed 10</th><th>Thu 11</th><th>Fri 12</th><th>Sat 13</th><th>Sun 14</th><th>Mon 15</th><th>Tue 16</th><th></th></tr></thead><tbody id="adminBody"></tbody></table></div>
-      </section>
-    </section>
-  </main>
-  <script src="admin.js"></script>
+
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <span class="brand-mark">
+                O
+            </span>
+
+            <span>
+                On-Call
+            </span>
+
+        </div>
+
+
+        <nav aria-label="Main navigation">
+
+            <button class="nav-item active">
+
+                <span>
+                    ▦
+                </span>
+
+                Manager view
+
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <button class="nav-item">
+
+                <span>
+                    ?
+                </span>
+
+                Help & support
+
+            </button>
+
+
+            <div class="signed-in">
+
+                <span class="avatar small">
+                    AM
+                </span>
+
+
+                <div>
+
+                    <strong>
+                        Ahmed Mohamed
+                    </strong>
+
+                    <small>
+                        Enterprise Solutions
+                    </small>
+
+                </div>
+
+
+                <span>
+                    ⋮
+                </span>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+
+    <main>
+
+
+        <header class="topbar">
+
+            <button class="mobile-menu"
+                    aria-label="Open navigation">
+
+                ☰
+
+            </button>
+
+
+            <div>
+
+                <span class="live-dot"></span>
+
+                <span class="coverage-label">
+                    Emergency coverage active
+                </span>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <button class="icon-btn"
+                        aria-label="Notifications">
+
+                    ♧
+
+                    <span class="notification-dot"></span>
+
+                </button>
+
+
+                <span class="time"
+                      id="currentTime">
+                </span>
+
+            </div>
+
+        </header>
+
+
+
+        <section id="managerPage"
+                 class="page active">
+
+
+            <div class="page-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        OPERATIONS CONTROL
+                    </p>
+
+                    <h1>
+                        Coverage overview
+                    </h1>
+
+                    <p>
+                        Monitor emergency support readiness
+                        and on-call coverage.
+                    </p>
+
+                </div>
+
+
+                <button class="primary-btn">
+
+                    ↥ Upload schedule
+
+                </button>
+
+            </div>
+
+
+
+            <div class="stats">
+
+
+                <article>
+
+                    <span>
+                        Total teams
+                    </span>
+
+                    <strong>
+                        48
+                    </strong>
+
+                    <small>
+                        Across 8 departments
+                    </small>
+
+                </article>
+
+
+                <article>
+
+                    <span>
+                        Complete schedules
+                    </span>
+
+                    <strong>
+                        42
+                    </strong>
+
+                    <small class="positive">
+                        ↑ 4 from last week
+                    </small>
+
+                </article>
+
+
+                <article>
+
+                    <span>
+                        Missing coverage
+                    </span>
+
+                    <strong class="orange-text">
+                        5
+                    </strong>
+
+                    <small>
+                        Needs manager action
+                    </small>
+
+                </article>
+
+
+                <article>
+
+                    <span>
+                        No schedule
+                    </span>
+
+                    <strong class="red-text">
+                        1
+                    </strong>
+
+                    <small>
+                        Security Operations
+                    </small>
+
+                </article>
+
+
+                <article>
+
+                    <span>
+                        Swaps this week
+                    </span>
+
+                    <strong>
+                        12
+                    </strong>
+
+                    <small>
+                        All recorded
+                    </small>
+
+                </article>
+
+            </div>
+
+
+
+            <section class="panel admin-table-panel">
+
+
+                <div class="panel-head split">
+
+
+                    <div>
+
+                        <h2>
+                            7-day team coverage
+                        </h2>
+
+                        <p>
+                            10–16 September 2026
+                        </p>
+
+                    </div>
+
+
+                    <button class="secondary-btn">
+
+                        Export report
+
+                    </button>
+
+                </div>
+
+
+
+                <div class="admin-filters">
+
+
+                    <label class="search">
+
+                        <span>
+                            ⌕
+                        </span>
+
+                        <input id="managerSearch"
+                               placeholder="Search teams or managers..." />
+
+                    </label>
+
+
+                    <button class="filter-btn">
+
+                        All statuses⌄
+
+                    </button>
+
+
+                    <button class="filter-btn">
+
+                        All departments⌄
+
+                    </button>
+
+
+                </div>
+
+
+
+                <div class="table-scroll">
+
+
+                    <table>
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Team
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Wed 10
+                                </th>
+
+                                <th>
+                                    Thu 11
+                                </th>
+
+                                <th>
+                                    Fri 12
+                                </th>
+
+                                <th>
+                                    Sat 13
+                                </th>
+
+                                <th>
+                                    Sun 14
+                                </th>
+
+                                <th>
+                                    Mon 15
+                                </th>
+
+                                <th>
+                                    Tue 16
+                                </th>
+
+                                <th></th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="managerBody">
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </section>
+
+
+        </section>
+
+
+    </main>
+
+
+    <script src="js/admin.js"></script>
+
+
 </body>
+
 </html>
