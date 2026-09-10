@@ -2,65 +2,55 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#ff7900" />
 
-    <meta name="viewport"
-          content="width=device-width,initial-scale=1" />
+    <title>On-Call | Manager</title>
 
-    <meta name="theme-color"
-          content="#ff7900" />
-
-    <title>
-        On-Call | Manager
-    </title>
-
-
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet">
 
-
-    <link rel="stylesheet"
-          href="../shared/styles.css" />
-
+    <link rel="stylesheet" href="../shared/styles.css" />
 </head>
 
 
 <body>
 
-
     <aside class="sidebar">
 
         <div class="brand">
-
-            <span class="brand-mark">
-                O
-            </span>
-
-            <span>
-                On-Call
-            </span>
-
+            <span class="brand-mark">O</span>
+            <span>On-Call</span>
         </div>
-
 
         <nav aria-label="Main navigation">
 
-            <button class="nav-item active">
+            <button class="nav-item active"
+                    data-section="overviewSection">
+                <span>⌂</span>
+                Overview
+            </button>
 
-                <span>
-                    ▦
-                </span>
+            <button class="nav-item"
+                    data-section="scheduleSection">
+                <span>▦</span>
+                On-Call Schedule
+            </button>
 
-                Manager view
+            <button class="nav-item"
+                    data-section="teamSection">
+                <span>👥</span>
+                My Team
+            </button>
 
+            <button class="nav-item"
+                    data-section="holidaySection">
+                <span>◷</span>
+                Holidays
             </button>
 
         </nav>
@@ -69,15 +59,9 @@
         <div class="sidebar-bottom">
 
             <button class="nav-item">
-
-                <span>
-                    ?
-                </span>
-
+                <span>?</span>
                 Help & support
-
             </button>
-
 
             <div class="signed-in">
 
@@ -85,23 +69,12 @@
                     AM
                 </span>
 
-
                 <div>
-
-                    <strong>
-                        Ahmed Mohamed
-                    </strong>
-
-                    <small>
-                        Enterprise Solutions
-                    </small>
-
+                    <strong>Ahmed Mohamed</strong>
+                    <small>ERP Applications Manager</small>
                 </div>
 
-
-                <span>
-                    ⋮
-                </span>
+                <span>⋮</span>
 
             </div>
 
@@ -110,42 +83,30 @@
     </aside>
 
 
-
     <main>
-
 
         <header class="topbar">
 
             <button class="mobile-menu"
                     aria-label="Open navigation">
-
                 ☰
-
             </button>
 
-
             <div>
-
                 <span class="live-dot"></span>
 
                 <span class="coverage-label">
                     Emergency coverage active
                 </span>
-
             </div>
-
 
             <div class="top-actions">
 
                 <button class="icon-btn"
                         aria-label="Notifications">
-
                     ♧
-
                     <span class="notification-dot"></span>
-
                 </button>
-
 
                 <span class="time"
                       id="currentTime">
@@ -156,268 +117,473 @@
         </header>
 
 
+        <!-- OVERVIEW -->
 
-        <section id="managerPage"
-                 class="page active">
-
+        <section id="overviewSection"
+                 class="manager-section">
 
             <div class="page-heading">
 
                 <div>
 
                     <p class="eyebrow">
-                        OPERATIONS CONTROL
+                        MANAGER DASHBOARD
                     </p>
 
                     <h1>
-                        Coverage overview
+                        ERP Applications
                     </h1>
 
                     <p>
-                        Monitor emergency support readiness
-                        and on-call coverage.
+                        Manage your team's Primary and Secondary
+                        on-call coverage.
                     </p>
 
                 </div>
 
+                <button class="primary-btn"
+                        id="createScheduleBtn">
 
-                <button class="primary-btn">
-
-                    ↥ Upload schedule
+                    + Create On-Call
 
                 </button>
 
             </div>
 
 
-
             <div class="stats">
 
-
                 <article>
-
-                    <span>
-                        Total teams
-                    </span>
-
-                    <strong>
-                        48
-                    </strong>
-
-                    <small>
-                        Across 8 departments
-                    </small>
-
+                    <span>My team members</span>
+                    <strong id="teamMemberCount">0</strong>
+                    <small>ERP Applications</small>
                 </article>
 
-
                 <article>
-
-                    <span>
-                        Complete schedules
-                    </span>
-
-                    <strong>
-                        42
-                    </strong>
-
-                    <small class="positive">
-                        ↑ 4 from last week
-                    </small>
-
+                    <span>Primary today</span>
+                    <strong id="primaryToday">—</strong>
+                    <small>Current primary coverage</small>
                 </article>
 
-
                 <article>
-
-                    <span>
-                        Missing coverage
-                    </span>
-
-                    <strong class="orange-text">
-                        5
-                    </strong>
-
-                    <small>
-                        Needs manager action
-                    </small>
-
+                    <span>Secondary today</span>
+                    <strong id="secondaryToday">—</strong>
+                    <small>Backup coverage</small>
                 </article>
 
-
                 <article>
-
-                    <span>
-                        No schedule
-                    </span>
-
-                    <strong class="red-text">
-                        1
-                    </strong>
-
-                    <small>
-                        Security Operations
-                    </small>
-
+                    <span>Schedule editors</span>
+                    <strong id="editorCount">0</strong>
+                    <small>Employees with privilege</small>
                 </article>
 
-
                 <article>
-
-                    <span>
-                        Swaps this week
-                    </span>
-
-                    <strong>
-                        12
-                    </strong>
-
-                    <small>
-                        All recorded
-                    </small>
-
+                    <span>Upcoming holidays</span>
+                    <strong id="holidayCount">0</strong>
+                    <small>With special coverage</small>
                 </article>
 
             </div>
 
 
-
-            <section class="panel admin-table-panel">
-
+            <section class="panel">
 
                 <div class="panel-head split">
-
 
                     <div>
 
                         <h2>
-                            7-day team coverage
+                            My department coverage
                         </h2>
 
                         <p>
-                            10–16 September 2026
+                            Primary and Secondary on-call schedule
                         </p>
 
                     </div>
 
+                    <button class="secondary-btn"
+                            data-open-schedule>
 
-                    <button class="secondary-btn">
-
-                        Export report
+                        Edit schedule
 
                     </button>
 
                 </div>
-
-
-
-                <div class="admin-filters">
-
-
-                    <label class="search">
-
-                        <span>
-                            ⌕
-                        </span>
-
-                        <input id="managerSearch"
-                               placeholder="Search teams or managers..." />
-
-                    </label>
-
-
-                    <button class="filter-btn">
-
-                        All statuses⌄
-
-                    </button>
-
-
-                    <button class="filter-btn">
-
-                        All departments⌄
-
-                    </button>
-
-
-                </div>
-
 
 
                 <div class="table-scroll">
 
-
                     <table>
-
 
                         <thead>
 
                             <tr>
-
-                                <th>
-                                    Team
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                                <th>
-                                    Wed 10
-                                </th>
-
-                                <th>
-                                    Thu 11
-                                </th>
-
-                                <th>
-                                    Fri 12
-                                </th>
-
-                                <th>
-                                    Sat 13
-                                </th>
-
-                                <th>
-                                    Sun 14
-                                </th>
-
-                                <th>
-                                    Mon 15
-                                </th>
-
-                                <th>
-                                    Tue 16
-                                </th>
-
-                                <th></th>
-
+                                <th>Date</th>
+                                <th>Day</th>
+                                <th>Primary</th>
+                                <th>Secondary</th>
+                                <th>Type</th>
+                                <th>Actions</th>
                             </tr>
 
                         </thead>
 
-
-                        <tbody id="managerBody">
+                        <tbody id="myDepartmentBody">
                         </tbody>
-
 
                     </table>
 
-
                 </div>
 
-
             </section>
-
 
         </section>
 
 
+
+        <!-- ALL ON-CALL SCHEDULES -->
+
+        <section id="scheduleSection"
+                 class="manager-section hidden">
+
+            <div class="page-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        COMPANY COVERAGE
+                    </p>
+
+                    <h1>
+                        All department on-calls
+                    </h1>
+
+                    <p>
+                        You can view every department.
+                        Only your own department can be edited.
+                    </p>
+
+                </div>
+
+                <button class="primary-btn"
+                        id="createScheduleBtn2">
+
+                    + Create ERP On-Call
+
+                </button>
+
+            </div>
+
+
+            <section class="panel">
+
+                <div class="panel-head split">
+
+                    <div>
+
+                        <h2>
+                            Department schedules
+                        </h2>
+
+                        <p>
+                            Company-wide Primary and Secondary coverage
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="admin-filters">
+
+                    <label class="search">
+
+                        <span>⌕</span>
+
+                        <input id="scheduleSearch"
+                               placeholder="Search department..." />
+
+                    </label>
+
+                    <button class="filter-btn">
+                        All departments⌄
+                    </button>
+
+                </div>
+
+
+                <div class="table-scroll">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Department</th>
+                                <th>Date</th>
+                                <th>Primary</th>
+                                <th>Secondary</th>
+                                <th>Coverage Type</th>
+                                <th>Permission</th>
+                                <th></th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="allScheduleBody">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </section>
+
+
+
+        <!-- MY TEAM -->
+
+        <section id="teamSection"
+                 class="manager-section hidden">
+
+            <div class="page-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        MY TEAM
+                    </p>
+
+                    <h1>
+                        ERP Applications Team
+                    </h1>
+
+                    <p>
+                        Manage team members and on-call schedule privileges.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <section class="panel">
+
+                <div class="panel-head">
+
+                    <h2>
+                        Team members
+                    </h2>
+
+                    <p>
+                        Employees with Schedule Privilege can create
+                        and edit on-calls for the team.
+                    </p>
+
+                </div>
+
+
+                <div class="table-scroll">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Employee</th>
+                                <th>Employee ID</th>
+                                <th>Phone</th>
+                                <th>Role</th>
+                                <th>Schedule Privilege</th>
+                                <th>Action</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="teamMembersBody">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </section>
+
+
+
+        <!-- HOLIDAYS -->
+
+        <section id="holidaySection"
+                 class="manager-section hidden">
+
+            <div class="page-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        HOLIDAY COVERAGE
+                    </p>
+
+                    <h1>
+                        Holidays
+                    </h1>
+
+                    <p>
+                        Manage special Primary and Secondary coverage
+                        for holidays.
+                    </p>
+
+                </div>
+
+                <button class="primary-btn"
+                        id="addHolidayBtn">
+
+                    + Add Holiday Coverage
+
+                </button>
+
+            </div>
+
+
+            <section class="panel">
+
+                <div class="table-scroll">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Holiday</th>
+                                <th>Date</th>
+                                <th>Primary</th>
+                                <th>Secondary</th>
+                                <th>Action</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="holidayBody">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </section>
+
     </main>
 
 
-    <script src="js/admin.js"></script>
 
+    <!-- CREATE / EDIT ON-CALL MODAL -->
+
+    <div class="modal-backdrop hidden"
+         id="scheduleModal">
+
+        <div class="modal">
+
+            <button class="close-modal"
+                    aria-label="Close">
+                ×
+            </button>
+
+            <p class="eyebrow">
+                ERP APPLICATIONS
+            </p>
+
+            <h2 id="scheduleModalTitle">
+                Create On-Call
+            </h2>
+
+            <p>
+                Assign a Primary and Secondary employee.
+            </p>
+
+
+            <label class="field-label">
+                Date
+            </label>
+
+            <input type="date"
+                   id="scheduleDate"
+                   class="form-input" />
+
+
+            <label class="field-label">
+                Primary On-Call
+            </label>
+
+            <select id="primarySelect">
+            </select>
+
+
+            <label class="field-label">
+                Secondary On-Call
+            </label>
+
+            <select id="secondarySelect">
+            </select>
+
+
+            <label class="holiday-check">
+
+                <input type="checkbox"
+                       id="holidayCheck">
+
+                This date is a holiday
+
+            </label>
+
+
+            <div id="holidayNameContainer"
+                 class="hidden">
+
+                <label class="field-label">
+                    Holiday Name
+                </label>
+
+                <input type="text"
+                       id="holidayName"
+                       class="form-input"
+                       placeholder="Example: Eid Holiday" />
+
+            </div>
+
+
+            <div class="warning">
+
+                Primary and Secondary employees cannot be the same person.
+
+            </div>
+
+
+            <button class="primary-btn full"
+                    id="saveScheduleBtn">
+
+                Save On-Call
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="toast hidden"
+         id="toast">
+    </div>
+
+
+    <script src="admin.js"></script>
 
 </body>
 
