@@ -1036,3 +1036,61 @@ th {
         grid-template-columns: 1fr
     }
 }
+/* =========================
+   MANAGER HEADER
+   ========================= */
+
+.manager-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.manager-hero-title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.manager-label {
+    width: fit-content;
+    color: #ff7900;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+}
+
+.manager-hero h1 {
+    margin: 0;
+    font-size: 32px;
+    line-height: 1.1;
+    font-weight: 700;
+    color: #1d1d1d;
+}
+
+.manager-create-btn {
+    min-width: 155px;
+    padding: 12px 18px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 700px) {
+
+    .manager-hero {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .manager-create-btn {
+        width: 100%;
+    }
+}
