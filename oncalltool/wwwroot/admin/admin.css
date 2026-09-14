@@ -1,7 +1,6 @@
 ﻿:root {
     --navy-950: #0e1220;
     --navy-900: #141a2c;
-    --navy-800: #1c2438;
     --ink: #12172a;
     --ink-soft: #5b6478;
     --ink-faint: #9aa2b4;
@@ -18,6 +17,10 @@
     --radius: 14px;
 }
 
+
+/* =====================================
+   RESET
+   ===================================== */
 
 * {
     box-sizing: border-box;
@@ -58,22 +61,21 @@ button {
 
 
 
-/* ==============================
+/* =====================================
    SIDEBAR
-   ============================== */
+   ===================================== */
 
 .sidebar {
     width: 250px;
-    flex-shrink: 0;
-    background: linear-gradient( 180deg, var(--navy-950), var(--navy-900) 60% );
-    color: white;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
     display: flex;
     flex-direction: column;
     padding: 22px 16px;
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
+    background: linear-gradient( 180deg, var(--navy-950), var(--navy-900) 60% );
+    color: white;
     overflow: hidden;
 }
 
@@ -90,6 +92,11 @@ button {
     }
 
 
+
+/* =====================================
+   BRAND
+   ===================================== */
+
 .brand {
     display: flex;
     align-items: center;
@@ -101,37 +108,42 @@ button {
 .brand-mark {
     width: 34px;
     height: 34px;
-    border-radius: 9px;
-    background: linear-gradient( 135deg, var(--amber), #e8672a );
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 800;
-    font-size: 15px;
+    border-radius: 9px;
+    background: linear-gradient( 135deg, var(--amber), #e8672a );
     color: #1a1206;
+    font-size: 15px;
+    font-weight: 800;
     box-shadow: 0 4px 14px rgba(242, 153, 74, 0.35);
 }
 
 
 .brand-name {
-    font-weight: 700;
     font-size: 16.5px;
+    font-weight: 700;
 }
 
 
 .brand-sub {
     margin-top: 2px;
+    color: var(--ink-faint);
     font-family: "JetBrains Mono", monospace;
     font-size: 10px;
     letter-spacing: 0.08em;
-    color: var(--ink-faint);
 }
 
+
+
+/* =====================================
+   SIDEBAR NAVIGATION
+   ===================================== */
 
 .sidebar nav {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
     margin-top: 6px;
     flex: 1;
 }
@@ -142,7 +154,7 @@ button {
     display: flex;
     align-items: center;
     gap: 11px;
-    padding: 11px 12px;
+    padding: 12px;
     border: none;
     border-radius: 10px;
     background: transparent;
@@ -157,8 +169,8 @@ button {
     .nav-item svg {
         width: 18px;
         height: 18px;
-        opacity: 0.85;
         flex-shrink: 0;
+        opacity: 0.85;
     }
 
 
@@ -181,10 +193,15 @@ button {
         }
 
 
+
+/* =====================================
+   SIDEBAR FOOTER
+   ===================================== */
+
 .sidebar-footer {
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding-top: 14px;
     margin-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 
@@ -192,9 +209,9 @@ button {
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 8px 12px;
     color: #8891a6;
     font-size: 13px;
-    padding: 8px 12px;
 }
 
 
@@ -202,9 +219,9 @@ button {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-top: 6px;
     padding: 10px;
     border-radius: 12px;
-    margin-top: 6px;
 }
 
 
@@ -216,12 +233,12 @@ button {
 .avatar {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
+    border-radius: 50%;
     font-size: 13px;
+    font-weight: 700;
     flex-shrink: 0;
 }
 
@@ -233,16 +250,16 @@ button {
 
 
 .user-name {
+    color: white;
     font-size: 13px;
     font-weight: 600;
-    color: white;
 }
 
 
 .user-role {
     margin-top: 2px;
-    font-size: 11px;
     color: var(--ink-faint);
+    font-size: 11px;
 }
 
 
@@ -254,9 +271,9 @@ button {
 
 
 
-/* ==============================
+/* =====================================
    MAIN
-   ============================== */
+   ===================================== */
 
 main {
     width: calc(100% - 250px);
@@ -265,6 +282,11 @@ main {
     padding: 28px 40px 60px;
 }
 
+
+
+/* =====================================
+   TOP BAR
+   ===================================== */
 
 .topbar {
     display: flex;
@@ -278,10 +300,10 @@ main {
     display: inline-flex;
     align-items: center;
     gap: 9px;
-    background: var(--green-soft);
-    color: #0f7a4b;
     padding: 7px 14px 7px 12px;
     border-radius: 100px;
+    background: var(--green-soft);
+    color: #0f7a4b;
     font-size: 13px;
     font-weight: 600;
 }
@@ -290,9 +312,9 @@ main {
 .pulse-dot {
     width: 8px;
     height: 8px;
+    position: relative;
     border-radius: 50%;
     background: var(--green);
-    position: relative;
 }
 
 
@@ -300,8 +322,8 @@ main {
         content: "";
         position: absolute;
         inset: -4px;
-        border-radius: 50%;
         border: 2px solid var(--green);
+        border-radius: 50%;
         opacity: 0.55;
         animation: pulse 2s ease-out infinite;
     }
@@ -331,14 +353,14 @@ main {
 .bell {
     width: 38px;
     height: 38px;
-    border-radius: 10px;
-    background: white;
-    border: 1px solid var(--line);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--ink-soft);
     position: relative;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: white;
+    color: var(--ink-soft);
 }
 
 
@@ -349,9 +371,9 @@ main {
         right: 8px;
         width: 7px;
         height: 7px;
+        border: 2px solid var(--bg);
         border-radius: 50%;
         background: var(--amber);
-        border: 2px solid var(--bg);
     }
 
 
@@ -362,22 +384,22 @@ main {
 
 .clock-time {
     font-family: "JetBrains Mono", monospace;
-    font-weight: 600;
     font-size: 16px;
+    font-weight: 600;
 }
 
 
 .clock-date {
     margin-top: 2px;
-    font-size: 11px;
     color: var(--ink-faint);
+    font-size: 11px;
 }
 
 
 
-/* ==============================
+/* =====================================
    PAGE HEADER
-   ============================== */
+   ===================================== */
 
 .page-head {
     display: flex;
@@ -390,10 +412,10 @@ main {
 
 
     .page-head h1 {
+        color: var(--ink);
         font-size: 30px;
         font-weight: 800;
         letter-spacing: -0.02em;
-        color: var(--ink);
     }
 
 
@@ -421,18 +443,18 @@ main {
 
 
 
-/* ==============================
+/* =====================================
    BUTTONS
-   ============================== */
+   ===================================== */
 
 .btn-primary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    padding: 12px 20px;
     border: none;
     border-radius: 10px;
-    padding: 12px 20px;
     background: var(--ink);
     color: white;
     font-size: 14px;
@@ -453,28 +475,11 @@ main {
     }
 
 
-.btn-ghost {
-    padding: 9px 16px;
-    background: white;
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    color: var(--ink);
-    font-size: 13px;
-    font-weight: 600;
-}
-
-
-    .btn-ghost:hover {
-        background: #fafafc;
-        border-color: #c7cbda;
-    }
-
-
 .action-btn {
+    padding: 8px 12px;
     border: 1px solid var(--line);
-    background: white;
     border-radius: 8px;
-    padding: 7px 11px;
+    background: white;
     color: var(--ink-soft);
     font-size: 12px;
     font-weight: 600;
@@ -482,29 +487,52 @@ main {
 
 
     .action-btn:hover {
-        color: var(--blue);
         border-color: #becbff;
+        color: var(--blue);
+    }
+
+
+.link-edit {
+    border: none;
+    background: transparent;
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+    .link-edit:hover {
+        text-decoration: underline;
     }
 
 
 
-/* ==============================
-   STAT CARDS
-   ============================== */
+/* =====================================
+   OVERVIEW CARDS
+   ===================================== */
 
 .stat-row {
     display: grid;
-    grid-template-columns: 1.15fr 1.6fr 1.6fr 1fr 1fr;
+    /*
+       FOUR cards only:
+       Team Members
+       Primary
+       Secondary
+       Schedule Editors
+    */
+
+    grid-template-columns: 1fr 1.55fr 1.55fr 1fr;
     gap: 16px;
     margin-bottom: 32px;
 }
 
 
 .card {
+    min-height: 125px;
     padding: 20px;
-    background: white;
     border: 1px solid var(--line);
     border-radius: var(--radius);
+    background: white;
 }
 
 
@@ -525,10 +553,15 @@ main {
 
 .stat-context {
     margin-top: 4px;
-    font-size: 12px;
     color: var(--ink-faint);
+    font-size: 12px;
 }
 
+
+
+/* =====================================
+   PRIMARY / SECONDARY CARDS
+   ===================================== */
 
 .coverage-card {
     border-left: 3px solid var(--green);
@@ -551,10 +584,10 @@ main {
 .coverage-avatar {
     width: 44px;
     height: 44px;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
     font-size: 13px;
     font-weight: 700;
     flex-shrink: 0;
@@ -574,6 +607,7 @@ main {
 
 
 .coverage-name {
+    color: var(--ink);
     font-size: 16px;
     font-weight: 700;
     line-height: 1.25;
@@ -588,15 +622,15 @@ main {
 
 
 
-/* ==============================
-   TABLE / SECTION
-   ============================== */
+/* =====================================
+   SECTION CARD
+   ===================================== */
 
 .section-card {
     overflow: hidden;
-    background: white;
     border: 1px solid var(--line);
     border-radius: var(--radius);
+    background: white;
 }
 
 
@@ -619,10 +653,15 @@ main {
 
     .section-head p {
         margin-top: 3px;
-        font-size: 13px;
         color: var(--ink-faint);
+        font-size: 13px;
     }
 
+
+
+/* =====================================
+   TABLE
+   ===================================== */
 
 .table-scroll {
     width: 100%;
@@ -638,11 +677,11 @@ table {
 
 thead th {
     padding: 13px 24px;
-    text-align: left;
     border-bottom: 1px solid var(--line);
     color: var(--ink-faint);
     font-size: 12px;
     font-weight: 600;
+    text-align: left;
 }
 
 
@@ -678,6 +717,11 @@ tbody tr:hover {
 }
 
 
+
+/* =====================================
+   PRIMARY / SECONDARY PERSON
+   ===================================== */
+
 .who {
     display: flex;
     align-items: center;
@@ -708,6 +752,11 @@ tbody tr:hover {
 }
 
 
+
+/* =====================================
+   BADGES
+   ===================================== */
+
 .badge {
     display: inline-block;
     padding: 4px 10px;
@@ -725,70 +774,48 @@ tbody tr:hover {
 }
 
 
-.badge-orange {
-    background: var(--amber-soft);
-    color: #aa5d17;
-}
-
-
 .badge-red {
     background: var(--red-soft);
     color: var(--red);
 }
 
 
-.link-edit {
-    border: none;
-    background: transparent;
-    color: var(--blue);
-    font-size: 13px;
-    font-weight: 600;
-}
 
+/* =====================================
+   MY TEAM
+   ===================================== */
 
-    .link-edit:hover {
-        text-decoration: underline;
-    }
-
-
-
-/* ==============================
-   SEARCH
-   ============================== */
-
-.search-box {
-    min-width: 230px;
+.employee-cell {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 9px 12px;
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    background: white;
+    gap: 10px;
 }
 
 
-    .search-box svg {
-        width: 16px;
-        height: 16px;
-        color: var(--ink-faint);
-    }
+.table-avatar {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #eef0f6;
+    color: var(--ink-soft);
+    font-size: 11px;
+    font-weight: 700;
+}
 
 
-    .search-box input {
-        width: 100%;
-        border: none;
-        outline: none;
-        background: transparent;
-        color: var(--ink);
-        font-size: 13px;
-    }
+.manager-text {
+    color: var(--ink-faint);
+    font-size: 12px;
+}
 
 
 
-/* ==============================
+/* =====================================
    MODAL
-   ============================== */
+   ===================================== */
 
 .modal-backdrop {
     position: fixed;
@@ -804,28 +831,39 @@ tbody tr:hover {
 
 
 .modal {
-    position: relative;
     width: 100%;
     max-width: 500px;
+    position: relative;
     padding: 28px;
-    background: white;
     border-radius: 16px;
+    background: white;
     box-shadow: 0 25px 70px rgba(14, 18, 32, 0.22);
 }
 
 
 .modal-close {
+    width: 34px;
+    height: 34px;
     position: absolute;
     top: 17px;
     right: 18px;
-    width: 34px;
-    height: 34px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: none;
-    background: #f5f5f8;
     border-radius: 8px;
+    background: #f5f5f8;
     color: var(--ink-soft);
     font-size: 22px;
+    cursor: pointer;
 }
+
+
+    .modal-close:hover {
+        background: #eceef3;
+        color: var(--ink);
+    }
 
 
 .modal-badge {
@@ -838,8 +876,8 @@ tbody tr:hover {
 
 
 .modal h2 {
-    font-size: 23px;
     margin-bottom: 7px;
+    font-size: 23px;
 }
 
 
@@ -878,21 +916,6 @@ tbody tr:hover {
     }
 
 
-.check-row {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    margin-top: 18px;
-    color: var(--ink-soft);
-    font-size: 13px;
-}
-
-
-    .check-row input {
-        accent-color: var(--amber);
-    }
-
-
 .modal-warning {
     margin-top: 18px;
     padding: 11px 13px;
@@ -910,16 +933,16 @@ tbody tr:hover {
 
 
 
-/* ==============================
+/* =====================================
    TOAST
-   ============================== */
+   ===================================== */
 
 .toast {
+    min-width: 270px;
     position: fixed;
     right: 30px;
     bottom: 30px;
     z-index: 1000;
-    min-width: 270px;
     padding: 14px 18px;
     border-radius: 10px;
     background: var(--navy-900);
@@ -931,9 +954,9 @@ tbody tr:hover {
 
 
 
-/* ==============================
+/* =====================================
    RESPONSIVE
-   ============================== */
+   ===================================== */
 
 @media (max-width: 1180px) {
 
@@ -949,55 +972,21 @@ tbody tr:hover {
         display: none;
     }
 
+
     main {
         width: 100%;
         margin-left: 0;
         padding: 20px;
     }
 
+
     .stat-row {
         grid-template-columns: 1fr;
     }
+
 
     .section-head {
         align-items: flex-start;
         flex-direction: column;
     }
-
-    .search-box {
-        width: 100%;
-    }
-}
-.employee-cell {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.table-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #eef0f6;
-    color: var(--ink-soft);
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.manager-text {
-    color: var(--ink-faint);
-    font-size: 12px;
-}
-
-.view-lock {
-    color: var(--ink-faint);
-}
-
-.empty-state {
-    padding: 45px !important;
-    text-align: center;
-    color: var(--ink-faint);
 }

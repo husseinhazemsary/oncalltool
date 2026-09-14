@@ -3,22 +3,27 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>On-Call — ERP Applications</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
           rel="stylesheet">
 
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet"
+          href="admin.css">
 </head>
 
 
 <body>
 
     <div class="app">
+
 
         <!-- =========================
              SIDEBAR
@@ -33,6 +38,7 @@
                 </div>
 
                 <div>
+
                     <div class="brand-name">
                         On-Call
                     </div>
@@ -40,12 +46,15 @@
                     <div class="brand-sub">
                         CONTROL ROOM
                     </div>
+
                 </div>
 
             </div>
 
 
             <nav>
+
+                <!-- OVERVIEW -->
 
                 <button class="nav-item active"
                         data-section="overviewSection">
@@ -64,28 +73,7 @@
                 </button>
 
 
-                <button class="nav-item"
-                        data-section="scheduleSection">
-
-                    <svg viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="2">
-
-                        <rect x="3"
-                              y="4"
-                              width="18"
-                              height="17"
-                              rx="2" />
-
-                        <path d="M3 9h18M8 3v3M16 3v3" />
-
-                    </svg>
-
-                    On-Call Schedule
-
-                </button>
-
+                <!-- MY TEAM -->
 
                 <button class="nav-item"
                         data-section="teamSection">
@@ -109,29 +97,10 @@
 
                 </button>
 
-
-                <button class="nav-item"
-                        data-section="holidaySection">
-
-                    <svg viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="2">
-
-                        <circle cx="12"
-                                cy="12"
-                                r="9" />
-
-                        <path d="M12 7v5l3 2" />
-
-                    </svg>
-
-                    Holidays
-
-                </button>
-
             </nav>
 
+
+            <!-- SIDEBAR FOOTER -->
 
             <div class="sidebar-footer">
 
@@ -188,7 +157,7 @@
 
 
         <!-- =========================
-             MAIN
+             MAIN CONTENT
              ========================= -->
 
         <main>
@@ -246,13 +215,15 @@
 
 
 
-            <!-- =========================
+            <!-- ==================================================
                  OVERVIEW
-                 ========================= -->
+                 ================================================== -->
 
             <section id="overviewSection"
                      class="manager-section">
 
+
+                <!-- PAGE TITLE -->
 
                 <div class="page-head">
 
@@ -269,6 +240,7 @@
                             </b>
 
                         </div>
+
 
                         <h1>
                             ERP Applications
@@ -297,10 +269,14 @@
 
 
 
-                <!-- STAT CARDS -->
+                <!-- =========================
+                     STAT CARDS
+                     ========================= -->
 
                 <div class="stat-row">
 
+
+                    <!-- TEAM MEMBERS -->
 
                     <div class="card">
 
@@ -321,11 +297,14 @@
 
 
 
+                    <!-- PRIMARY -->
+
                     <div class="card coverage-card">
 
                         <div class="stat-label">
                             Primary today
                         </div>
+
 
                         <div class="coverage-person">
 
@@ -333,6 +312,7 @@
                                  id="primaryInitials">
                                 —
                             </div>
+
 
                             <div>
 
@@ -353,11 +333,14 @@
 
 
 
+                    <!-- SECONDARY -->
+
                     <div class="card coverage-card secondary">
 
                         <div class="stat-label">
                             Secondary today
                         </div>
+
 
                         <div class="coverage-person">
 
@@ -365,6 +348,7 @@
                                  id="secondaryInitials">
                                 —
                             </div>
+
 
                             <div>
 
@@ -385,6 +369,8 @@
 
 
 
+                    <!-- SCHEDULE EDITORS -->
+
                     <div class="card">
 
                         <div class="stat-label">
@@ -403,29 +389,13 @@
                     </div>
 
 
-
-                    <div class="card">
-
-                        <div class="stat-label">
-                            Upcoming holidays
-                        </div>
-
-                        <div class="stat-number"
-                             id="holidayCount">
-                            0
-                        </div>
-
-                        <div class="stat-context">
-                            With special coverage
-                        </div>
-
-                    </div>
-
                 </div>
 
 
 
-                <!-- COVERAGE -->
+                <!-- =========================
+                     TEAM COVERAGE
+                     ========================= -->
 
                 <div class="section-card">
 
@@ -434,22 +404,14 @@
                         <div>
 
                             <h2>
-                                My department coverage
+                                My team coverage
                             </h2>
 
                             <p>
-                                Primary and secondary on-call schedule
+                                Primary and secondary on-call assignments
                             </p>
 
                         </div>
-
-
-                        <button class="btn-ghost"
-                                id="editSchedulePageBtn">
-
-                            Edit schedule
-
-                        </button>
 
                     </div>
 
@@ -474,10 +436,6 @@
                                         Secondary
                                     </th>
 
-                                    <th>
-                                        Type
-                                    </th>
-
                                     <th></th>
 
                                 </tr>
@@ -498,146 +456,9 @@
 
 
 
-            <!-- =========================
-                 ON-CALL SCHEDULE
-                 ========================= -->
-
-            <section id="scheduleSection"
-                     class="manager-section hidden">
-
-
-                <div class="page-head">
-
-                    <div>
-
-                        <div class="breadcrumb">
-
-                            Manager
-
-                            <span>›</span>
-
-                            <b>
-                                On-Call Schedule
-                            </b>
-
-                        </div>
-
-                        <h1>
-                            Department schedules
-                        </h1>
-
-                        <p class="page-description">
-                            View all departments. You can edit ERP Applications only.
-                        </p>
-
-                    </div>
-
-
-                    <button class="btn-primary"
-                            id="createScheduleBtn2">
-
-                        <svg viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2.4">
-
-                            <path d="M12 5v14M5 12h14" />
-
-                        </svg>
-
-                        Create on-call
-
-                    </button>
-
-                </div>
-
-
-
-                <div class="section-card">
-
-
-                    <div class="section-head">
-
-                        <div>
-
-                            <h2>
-                                Company on-call coverage
-                            </h2>
-
-                            <p>
-                                Primary and secondary assignments
-                            </p>
-
-                        </div>
-
-
-                        <div class="search-box">
-
-                            <svg viewBox="0 0 24 24"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 stroke-width="2">
-
-                                <circle cx="11"
-                                        cy="11"
-                                        r="7" />
-
-                                <path d="M20 20l-4-4" />
-
-                            </svg>
-
-                            <input id="scheduleSearch"
-                                   placeholder="Search department">
-
-                        </div>
-
-                    </div>
-
-
-
-                    <div class="table-scroll">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>Department</th>
-
-                                    <th>Date</th>
-
-                                    <th>Primary</th>
-
-                                    <th>Secondary</th>
-
-                                    <th>Type</th>
-
-                                    <th>Access</th>
-
-                                    <th></th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody id="allScheduleBody">
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =========================
+            <!-- ==================================================
                  MY TEAM
-                 ========================= -->
+                 ================================================== -->
 
             <section id="teamSection"
                      class="manager-section hidden">
@@ -659,9 +480,11 @@
 
                         </div>
 
+
                         <h1>
                             ERP Applications Team
                         </h1>
+
 
                         <p class="page-description">
                             Manage scheduling privileges for your team members.
@@ -693,7 +516,6 @@
                     </div>
 
 
-
                     <div class="table-scroll">
 
                         <table>
@@ -702,15 +524,25 @@
 
                                 <tr>
 
-                                    <th>Employee</th>
+                                    <th>
+                                        Employee
+                                    </th>
 
-                                    <th>Employee ID</th>
+                                    <th>
+                                        Employee ID
+                                    </th>
 
-                                    <th>Phone</th>
+                                    <th>
+                                        Phone
+                                    </th>
 
-                                    <th>Role</th>
+                                    <th>
+                                        Role
+                                    </th>
 
-                                    <th>Schedule privilege</th>
+                                    <th>
+                                        Schedule privilege
+                                    </th>
 
                                     <th></th>
 
@@ -731,125 +563,15 @@
             </section>
 
 
-
-            <!-- =========================
-                 HOLIDAYS
-                 ========================= -->
-
-            <section id="holidaySection"
-                     class="manager-section hidden">
-
-
-                <div class="page-head">
-
-                    <div>
-
-                        <div class="breadcrumb">
-
-                            Manager
-
-                            <span>›</span>
-
-                            <b>
-                                Holidays
-                            </b>
-
-                        </div>
-
-                        <h1>
-                            Holiday coverage
-                        </h1>
-
-                        <p class="page-description">
-                            Create special Primary and Secondary coverage for holidays.
-                        </p>
-
-                    </div>
-
-
-                    <button class="btn-primary"
-                            id="addHolidayBtn">
-
-                        <svg viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2.4">
-
-                            <path d="M12 5v14M5 12h14" />
-
-                        </svg>
-
-                        Add holiday
-
-                    </button>
-
-                </div>
-
-
-
-                <div class="section-card">
-
-                    <div class="section-head">
-
-                        <div>
-
-                            <h2>
-                                Holiday schedule
-                            </h2>
-
-                            <p>
-                                ERP Applications special coverage dates
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="table-scroll">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>Holiday</th>
-
-                                    <th>Date</th>
-
-                                    <th>Primary</th>
-
-                                    <th>Secondary</th>
-
-                                    <th></th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody id="holidayBody">
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
         </main>
 
     </div>
 
 
 
-    <!-- =========================
-         CREATE / EDIT MODAL
-         ========================= -->
+    <!-- ==================================================
+         CREATE / EDIT ON-CALL MODAL
+         ================================================== -->
 
     <div class="modal-backdrop hidden"
          id="scheduleModal">
@@ -858,12 +580,17 @@
         <div class="modal">
 
 
+            <!-- CLOSE -->
+
             <button type="button"
                     class="modal-close"
                     id="closeScheduleModal"
                     aria-label="Close">
+
                 ×
+
             </button>
+
 
 
             <div class="modal-badge">
@@ -882,6 +609,8 @@
 
 
 
+            <!-- DATE -->
+
             <label class="field-label"
                    for="scheduleDate">
 
@@ -895,6 +624,8 @@
                    class="form-control">
 
 
+
+            <!-- PRIMARY -->
 
             <label class="field-label"
                    for="primarySelect">
@@ -910,6 +641,8 @@
 
 
 
+            <!-- SECONDARY -->
+
             <label class="field-label"
                    for="secondarySelect">
 
@@ -924,37 +657,7 @@
 
 
 
-            <label class="check-row">
-
-                <input type="checkbox"
-                       id="holidayCheck">
-
-                <span>
-                    This date is a holiday
-                </span>
-
-            </label>
-
-
-
-            <div id="holidayNameContainer"
-                 class="hidden">
-
-                <label class="field-label"
-                       for="holidayName">
-
-                    Holiday name
-
-                </label>
-
-                <input type="text"
-                       id="holidayName"
-                       class="form-control"
-                       placeholder="Example: Eid Holiday">
-
-            </div>
-
-
+            <!-- WARNING -->
 
             <div class="modal-warning">
 
@@ -964,6 +667,8 @@
 
 
 
+            <!-- SAVE -->
+
             <button class="btn-primary modal-save"
                     id="saveScheduleBtn">
 
@@ -971,17 +676,23 @@
 
             </button>
 
+
         </div>
 
     </div>
 
 
 
+    <!-- TOAST -->
+
     <div class="toast hidden"
          id="toast">
     </div>
 
 
-    <script src="admin.js?v=20260913-2"></script>
+
+    <script src="admin.js?v=20260914-1"></script>
+
 </body>
+
 </html>

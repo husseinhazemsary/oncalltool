@@ -4,7 +4,6 @@
 const MANAGER_DEPARTMENT = "ERP Applications";
 
 
-
 /* =============================
    TEAM MEMBERS
    ============================= */
@@ -59,9 +58,8 @@ const teamMembers = [
 ];
 
 
-
 /* =============================
-   MOCK ON-CALL DATA
+   ON-CALL MOCK DATA
    ============================= */
 
 let schedules = [
@@ -69,78 +67,47 @@ let schedules = [
     {
         id: 1,
         department: "ERP Applications",
-        date: "2026-09-13",
+        date: "2026-09-14",
         primary: "Ahmed Mohamed",
-        secondary: "Mohamed Hassan",
-        holiday: false,
-        holidayName: ""
+        secondary: "Mohamed Hassan"
     },
 
     {
         id: 2,
         department: "ERP Applications",
-        date: "2026-09-14",
+        date: "2026-09-15",
         primary: "Sara Ibrahim",
-        secondary: "Omar Khalil",
-        holiday: false,
-        holidayName: ""
+        secondary: "Omar Khalil"
     },
 
     {
         id: 3,
         department: "ERP Applications",
-        date: "2026-09-15",
+        date: "2026-09-16",
         primary: "Karim Ali",
-        secondary: "Ahmed Mohamed",
-        holiday: false,
-        holidayName: ""
+        secondary: "Ahmed Mohamed"
     },
 
     {
         id: 4,
-        department: "Database",
-        date: "2026-09-13",
-        primary: "Mahmoud Ali",
-        secondary: "Hany Ibrahim",
-        holiday: false,
-        holidayName: ""
+        department: "ERP Applications",
+        date: "2026-09-17",
+        primary: "Mohamed Hassan",
+        secondary: "Sara Ibrahim"
     },
 
     {
         id: 5,
-        department: "Network",
-        date: "2026-09-13",
-        primary: "Omar Adel",
-        secondary: "Sara Hassan",
-        holiday: false,
-        holidayName: ""
-    },
-
-    {
-        id: 6,
-        department: "Billing",
-        date: "2026-09-13",
-        primary: "Mona Ali",
-        secondary: "Ali Hassan",
-        holiday: false,
-        holidayName: ""
-    },
-
-    {
-        id: 7,
-        department: "Integration",
-        date: "2026-09-13",
-        primary: "Karim Mostafa",
-        secondary: "Omar Ahmed",
-        holiday: false,
-        holidayName: ""
+        department: "ERP Applications",
+        date: "2026-09-18",
+        primary: "Omar Khalil",
+        secondary: "Karim Ali"
     }
 
 ];
 
 
 let editingScheduleId = null;
-
 
 
 /* =============================
@@ -167,7 +134,6 @@ function formatDate(dateString) {
 }
 
 
-
 function getDayName(dateString) {
 
     const date =
@@ -186,23 +152,21 @@ function getDayName(dateString) {
 }
 
 
-
 function getInitials(name) {
 
-    if (!name) {
+    if (!name || name === "—") {
         return "—";
     }
 
 
     return name
         .split(" ")
-        .map(x => x[0])
+        .map(word => word[0])
         .slice(0, 2)
         .join("")
         .toUpperCase();
 
 }
-
 
 
 function getTodayISO() {
@@ -218,19 +182,13 @@ function getTodayISO() {
     const month =
         String(
             now.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
+        ).padStart(2, "0");
 
 
     const day =
         String(
             now.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
+        ).padStart(2, "0");
 
 
     return `${year}-${month}-${day}`;
@@ -238,9 +196,8 @@ function getTodayISO() {
 }
 
 
-
 /* =============================
-   OVERVIEW TABLE
+   OVERVIEW SCHEDULE
    ============================= */
 
 function renderMyDepartment() {
@@ -249,8 +206,8 @@ function renderMyDepartment() {
         schedules
 
             .filter(
-                x =>
-                    x.department ===
+                schedule =>
+                    schedule.department ===
                     MANAGER_DEPARTMENT
             )
 
@@ -318,26 +275,6 @@ function renderMyDepartment() {
 
                 <td>
 
-                    ${schedule.holiday
-
-                ? `
-                                <span class="badge badge-orange">
-                                    ${schedule.holidayName || "Holiday"}
-                                </span>
-                              `
-
-                : `
-                                <span class="badge">
-                                    Normal day
-                                </span>
-                              `
-            }
-
-                </td>
-
-
-                <td>
-
                     <button
                         class="link-edit"
                         onclick="editSchedule(${schedule.id})">
@@ -353,175 +290,6 @@ function renderMyDepartment() {
         `).join("");
 
 }
-
-
-
-/* =============================
-   ALL DEPARTMENT SCHEDULES
-   ============================= */
-
-function renderAllSchedules(search = "") {
-
-    const filtered =
-
-        schedules
-
-            .filter(
-                schedule =>
-                    schedule.department
-                        .toLowerCase()
-                        .includes(
-                            search.toLowerCase()
-                        )
-            )
-
-            .sort(
-                (a, b) =>
-                    new Date(a.date) -
-                    new Date(b.date)
-            );
-
-
-    document.querySelector(
-        "#allScheduleBody"
-    ).innerHTML =
-
-        filtered.map(schedule => {
-
-
-            const canEdit =
-
-                schedule.department ===
-                MANAGER_DEPARTMENT;
-
-
-            return `
-
-                <tr>
-
-                    <td>
-
-                        <strong>
-                            ${schedule.department}
-                        </strong>
-
-                    </td>
-
-
-                    <td>
-
-                        <div class="cell-date">
-                            ${formatDate(schedule.date)}
-                        </div>
-
-                        <div class="cell-day">
-                            ${getDayName(schedule.date)}
-                        </div>
-
-                    </td>
-
-
-                    <td>
-
-                        <div class="who">
-
-                            <span class="dot p"></span>
-
-                            <span class="who-name">
-                                ${schedule.primary}
-                            </span>
-
-                        </div>
-
-                    </td>
-
-
-                    <td>
-
-                        <div class="who">
-
-                            <span class="dot s"></span>
-
-                            <span class="who-name">
-                                ${schedule.secondary}
-                            </span>
-
-                        </div>
-
-                    </td>
-
-
-                    <td>
-
-                        ${schedule.holiday
-
-                    ? `
-                                    <span class="badge badge-orange">
-                                        ${schedule.holidayName || "Holiday"}
-                                    </span>
-                                  `
-
-                    : `
-                                    <span class="badge">
-                                        Normal day
-                                    </span>
-                                  `
-                }
-
-                    </td>
-
-
-                    <td>
-
-                        ${canEdit
-
-                    ? `
-                                    <span class="badge badge-green">
-                                        Can edit
-                                    </span>
-                                  `
-
-                    : `
-                                    <span class="badge">
-                                        View only
-                                    </span>
-                                  `
-                }
-
-                    </td>
-
-
-                    <td>
-
-                        ${canEdit
-
-                    ? `
-                                    <button
-                                        class="link-edit"
-                                        onclick="editSchedule(${schedule.id})">
-
-                                        Edit
-
-                                    </button>
-                                  `
-
-                    : `
-                                    <span class="view-lock">
-                                        🔒
-                                    </span>
-                                  `
-                }
-
-                    </td>
-
-                </tr>
-
-            `;
-
-        }).join("");
-
-}
-
 
 
 /* =============================
@@ -644,14 +412,12 @@ function renderTeamMembers() {
 }
 
 
-
 function togglePrivilege(employeeId) {
 
     const employee =
-
         teamMembers.find(
-            x =>
-                x.id === employeeId
+            person =>
+                person.id === employeeId
         );
 
 
@@ -669,152 +435,21 @@ function togglePrivilege(employeeId) {
     updateStats();
 
 
-    if (employee.schedulePrivilege) {
+    showToast(
 
-        showToast(
-            `${employee.name} can now manage team on-call schedules.`
-        );
+        employee.schedulePrivilege
 
-    }
+            ? `${employee.name} can now manage team on-call schedules.`
 
-    else {
+            : `${employee.name}'s scheduling privilege was removed.`
 
-        showToast(
-            `${employee.name}'s scheduling privilege was removed.`
-        );
-
-    }
+    );
 
 }
 
 
-
 /* =============================
-   HOLIDAYS
-   ============================= */
-
-function renderHolidays() {
-
-    const holidays =
-
-        schedules.filter(
-            x =>
-                x.department ===
-                MANAGER_DEPARTMENT
-                &&
-                x.holiday
-        );
-
-
-    const body =
-        document.querySelector(
-            "#holidayBody"
-        );
-
-
-    if (
-        holidays.length === 0
-    ) {
-
-        body.innerHTML = `
-
-            <tr>
-
-                <td colspan="5"
-                    class="empty-state">
-
-                    No holiday coverage has been created yet.
-
-                </td>
-
-            </tr>
-
-        `;
-
-        return;
-    }
-
-
-    body.innerHTML =
-
-        holidays.map(schedule => `
-
-            <tr>
-
-                <td>
-
-                    <strong>
-                        ${schedule.holidayName || "Holiday"}
-                    </strong>
-
-                </td>
-
-
-                <td>
-
-                    <div class="cell-date">
-                        ${formatDate(schedule.date)}
-                    </div>
-
-                    <div class="cell-day">
-                        ${getDayName(schedule.date)}
-                    </div>
-
-                </td>
-
-
-                <td>
-
-                    <div class="who">
-
-                        <span class="dot p"></span>
-
-                        <span class="who-name">
-                            ${schedule.primary}
-                        </span>
-
-                    </div>
-
-                </td>
-
-
-                <td>
-
-                    <div class="who">
-
-                        <span class="dot s"></span>
-
-                        <span class="who-name">
-                            ${schedule.secondary}
-                        </span>
-
-                    </div>
-
-                </td>
-
-
-                <td>
-
-                    <button
-                        class="link-edit"
-                        onclick="editSchedule(${schedule.id})">
-
-                        Edit
-
-                    </button>
-
-                </td>
-
-            </tr>
-
-        `).join("");
-
-}
-
-
-
-/* =============================
-   SELECT EMPLOYEES
+   EMPLOYEE SELECTS
    ============================= */
 
 function populateEmployeeSelects() {
@@ -831,47 +466,68 @@ function populateEmployeeSelects() {
         );
 
 
-    const options =
-
-        teamMembers.map(employee => `
-
-            <option value="${employee.name}">
-
-                ${employee.name}
-
-            </option>
-
-        `).join("");
+    primary.innerHTML = "";
+    secondary.innerHTML = "";
 
 
-    primary.innerHTML =
-        options;
+    teamMembers.forEach(employee => {
+
+        const primaryOption =
+            document.createElement(
+                "option"
+            );
 
 
-    secondary.innerHTML =
-        options;
+        primaryOption.value =
+            employee.name;
 
 
-    if (
-        teamMembers.length > 1
-    ) {
+        primaryOption.textContent =
+            `${employee.name} — ${employee.employeeId}`;
 
-        secondary.selectedIndex =
-            1;
+
+        const secondaryOption =
+            document.createElement(
+                "option"
+            );
+
+
+        secondaryOption.value =
+            employee.name;
+
+
+        secondaryOption.textContent =
+            `${employee.name} — ${employee.employeeId}`;
+
+
+        primary.appendChild(
+            primaryOption
+        );
+
+
+        secondary.appendChild(
+            secondaryOption
+        );
+
+    });
+
+
+    if (teamMembers.length > 1) {
+
+        primary.selectedIndex = 0;
+
+        secondary.selectedIndex = 1;
 
     }
 
 }
 
 
-
 /* =============================
-   OPEN CREATE MODAL
+   CREATE
    ============================= */
 
-function openCreateScheduleModal(
-    isHoliday = false
-) {
+function openCreateScheduleModal() {
 
     editingScheduleId =
         null;
@@ -883,34 +539,13 @@ function openCreateScheduleModal(
     document.querySelector(
         "#scheduleModalTitle"
     ).textContent =
-
-        isHoliday
-            ? "Create holiday coverage"
-            : "Create on-call";
+        "Create on-call";
 
 
     document.querySelector(
         "#scheduleDate"
-    ).value = "";
-
-
-    document.querySelector(
-        "#holidayCheck"
-    ).checked =
-        isHoliday;
-
-
-    document.querySelector(
-        "#holidayName"
-    ).value = "";
-
-
-    document.querySelector(
-        "#holidayNameContainer"
-    ).classList.toggle(
-        "hidden",
-        !isHoliday
-    );
+    ).value =
+        getTodayISO();
 
 
     document.querySelector(
@@ -922,7 +557,6 @@ function openCreateScheduleModal(
 }
 
 
-
 /* =============================
    EDIT
    ============================= */
@@ -930,27 +564,13 @@ function openCreateScheduleModal(
 function editSchedule(id) {
 
     const schedule =
-
         schedules.find(
-            x =>
-                x.id === id
+            item =>
+                item.id === id
         );
 
 
     if (!schedule) {
-        return;
-    }
-
-
-    if (
-        schedule.department !==
-        MANAGER_DEPARTMENT
-    ) {
-
-        showToast(
-            "This department is view-only."
-        );
-
         return;
     }
 
@@ -987,26 +607,6 @@ function editSchedule(id) {
 
 
     document.querySelector(
-        "#holidayCheck"
-    ).checked =
-        schedule.holiday;
-
-
-    document.querySelector(
-        "#holidayName"
-    ).value =
-        schedule.holidayName || "";
-
-
-    document.querySelector(
-        "#holidayNameContainer"
-    ).classList.toggle(
-        "hidden",
-        !schedule.holiday
-    );
-
-
-    document.querySelector(
         "#scheduleModal"
     ).classList.remove(
         "hidden"
@@ -1015,9 +615,8 @@ function editSchedule(id) {
 }
 
 
-
 /* =============================
-   SAVE SCHEDULE
+   SAVE
    ============================= */
 
 function saveSchedule() {
@@ -1040,19 +639,6 @@ function saveSchedule() {
         ).value;
 
 
-    const holiday =
-        document.querySelector(
-            "#holidayCheck"
-        ).checked;
-
-
-    const holidayName =
-        document.querySelector(
-            "#holidayName"
-        ).value.trim();
-
-
-
     if (!date) {
 
         showToast(
@@ -1064,9 +650,7 @@ function saveSchedule() {
     }
 
 
-    if (
-        primary === secondary
-    ) {
+    if (primary === secondary) {
 
         showToast(
             "Primary and Secondary must be different employees."
@@ -1077,30 +661,12 @@ function saveSchedule() {
     }
 
 
-    if (
-        holiday &&
-        !holidayName
-    ) {
-
-        showToast(
-            "Please enter the holiday name."
-        );
-
-        return;
-
-    }
-
-
-
-    if (
-        editingScheduleId !== null
-    ) {
+    if (editingScheduleId !== null) {
 
         const schedule =
-
             schedules.find(
-                x =>
-                    x.id ===
+                item =>
+                    item.id ===
                     editingScheduleId
             );
 
@@ -1116,24 +682,13 @@ function saveSchedule() {
         schedule.secondary =
             secondary;
 
-
-        schedule.holiday =
-            holiday;
-
-
-        schedule.holidayName =
-            holiday
-                ? holidayName
-                : "";
-
     }
 
     else {
 
         schedules.push({
 
-            id:
-                Date.now(),
+            id: Date.now(),
 
             department:
                 MANAGER_DEPARTMENT,
@@ -1142,14 +697,7 @@ function saveSchedule() {
 
             primary,
 
-            secondary,
-
-            holiday,
-
-            holidayName:
-                holiday
-                    ? holidayName
-                    : ""
+            secondary
 
         });
 
@@ -1157,7 +705,6 @@ function saveSchedule() {
 
 
     closeScheduleModal();
-
 
     renderEverything();
 
@@ -1169,9 +716,8 @@ function saveSchedule() {
 }
 
 
-
 /* =============================
-   STATS
+   OVERVIEW STATS
    ============================= */
 
 function updateStats() {
@@ -1183,12 +729,11 @@ function updateStats() {
 
 
     const editors =
-
         teamMembers.filter(
-            x =>
-                x.role !== "Manager"
+            employee =>
+                employee.role !== "Manager"
                 &&
-                x.schedulePrivilege
+                employee.schedulePrivilege
         );
 
 
@@ -1198,48 +743,28 @@ function updateStats() {
         editors.length;
 
 
-    const holidays =
-
-        schedules.filter(
-            x =>
-                x.department ===
-                MANAGER_DEPARTMENT
-                &&
-                x.holiday
-        );
-
-
-    document.querySelector(
-        "#holidayCount"
-    ).textContent =
-        holidays.length;
-
-
-
     const today =
         getTodayISO();
 
 
     let currentSchedule =
-
         schedules.find(
-            x =>
-                x.department ===
+            schedule =>
+                schedule.department ===
                 MANAGER_DEPARTMENT
                 &&
-                x.date === today
+                schedule.date === today
         );
 
 
     if (!currentSchedule) {
 
         currentSchedule =
-
             schedules
 
                 .filter(
-                    x =>
-                        x.department ===
+                    schedule =>
+                        schedule.department ===
                         MANAGER_DEPARTMENT
                 )
 
@@ -1252,16 +777,13 @@ function updateStats() {
     }
 
 
-
     const primaryName =
-
         currentSchedule
             ? currentSchedule.primary
             : "—";
 
 
     const secondaryName =
-
         currentSchedule
             ? currentSchedule.secondary
             : "—";
@@ -1295,7 +817,6 @@ function updateStats() {
         );
 
 }
-
 
 
 /* =============================
@@ -1346,7 +867,6 @@ function showSection(sectionId) {
 }
 
 
-
 document
     .querySelectorAll(
         "[data-section]"
@@ -1367,7 +887,6 @@ document
     });
 
 
-
 /* =============================
    MODAL
    ============================= */
@@ -1380,8 +899,11 @@ function closeScheduleModal() {
         "hidden"
     );
 
-}
 
+    editingScheduleId =
+        null;
+
+}
 
 
 document.querySelector(
@@ -1390,13 +912,12 @@ document.querySelector(
     closeScheduleModal;
 
 
-
 document.querySelector(
     "#scheduleModal"
-).onclick = e => {
+).onclick = event => {
 
     if (
-        e.target.id ===
+        event.target.id ===
         "scheduleModal"
     ) {
 
@@ -1407,91 +928,37 @@ document.querySelector(
 };
 
 
+document.addEventListener(
+    "keydown",
+    event => {
 
-document.querySelector(
-    "#holidayCheck"
-).onchange = e => {
+        if (event.key === "Escape") {
 
-    document.querySelector(
-        "#holidayNameContainer"
-    ).classList.toggle(
-        "hidden",
-        !e.target.checked
-    );
+            closeScheduleModal();
 
-};
+        }
 
+    }
+);
 
 
 /* =============================
-   BUTTON EVENTS
+   BUTTONS
    ============================= */
 
 document.querySelector(
     "#createScheduleBtn"
 ).onclick = () => {
 
-    openCreateScheduleModal(
-        false
-    );
+    openCreateScheduleModal();
 
 };
-
-
-
-document.querySelector(
-    "#createScheduleBtn2"
-).onclick = () => {
-
-    openCreateScheduleModal(
-        false
-    );
-
-};
-
-
-
-document.querySelector(
-    "#addHolidayBtn"
-).onclick = () => {
-
-    openCreateScheduleModal(
-        true
-    );
-
-};
-
 
 
 document.querySelector(
     "#saveScheduleBtn"
 ).onclick =
     saveSchedule;
-
-
-
-document.querySelector(
-    "#editSchedulePageBtn"
-).onclick = () => {
-
-    showSection(
-        "scheduleSection"
-    );
-
-};
-
-
-
-document.querySelector(
-    "#scheduleSearch"
-).oninput = e => {
-
-    renderAllSchedules(
-        e.target.value
-    );
-
-};
-
 
 
 /* =============================
@@ -1527,7 +994,6 @@ function showToast(message) {
     );
 
 }
-
 
 
 /* =============================
@@ -1569,7 +1035,6 @@ function updateClock() {
 }
 
 
-
 /* =============================
    INITIAL RENDER
    ============================= */
@@ -1578,16 +1043,11 @@ function renderEverything() {
 
     renderMyDepartment();
 
-    renderAllSchedules();
-
     renderTeamMembers();
-
-    renderHolidays();
 
     updateStats();
 
 }
-
 
 
 updateClock();
