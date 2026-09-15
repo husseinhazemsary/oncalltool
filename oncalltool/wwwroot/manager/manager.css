@@ -1105,3 +1105,39 @@ tbody tr:hover {
         width: 100%;
     }
 }
+/* =========================================================
+   SCHEDULE FILTERS
+   ========================================================= */
+
+.schedule-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+
+.filter-btn {
+    min-height: 34px;
+    padding: 0 13px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: white;
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-weight: 600;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+
+    .filter-btn:hover {
+        border-color: #c8cde0;
+        color: var(--ink);
+    }
+
+
+    .filter-btn.active {
+        border-color: var(--ink);
+        background: var(--ink);
+        color: white;
+    }

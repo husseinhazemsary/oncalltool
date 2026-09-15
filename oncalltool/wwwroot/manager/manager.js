@@ -29,6 +29,9 @@ let dashboard = null;
 
 let editingScheduleId = null;
 
+let scheduleFilter =
+    "next7";
+
 
 /* =========================================================
    API HELPER
@@ -129,6 +132,174 @@ async function loadSchedules() {
 /* =========================================================
    HELPERS
    ========================================================= */
+
+function parseLocalDate(
+    dateString
+) {
+
+    const cleanDate =
+        normalizeDate(
+            dateString
+        );
+
+
+    const parts =
+        cleanDate
+            .split("-")
+            .map(Number);
+
+
+    return new Date(
+        parts[0],
+        parts[1] - 1,
+        parts[2]
+    );
+}
+
+
+function getTodayDate() {
+
+    const now =
+        new Date();
+
+
+    return new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+    );
+}
+
+
+function addDays(
+    date,
+    numberOfDays
+) {
+
+    const result =
+        new Date(
+            date
+        );
+
+
+    result.setDate(
+        result.getDate()
+        +
+        numberOfDays
+    );
+
+
+    return result;
+}
+
+
+function filterSchedulesByPeriod(
+    data
+) {
+
+    const today =
+        getTodayDate();
+
+
+    if (
+        scheduleFilter ===
+        "today"
+    ) {
+
+        return data.filter(
+            schedule => {
+
+                const date =
+                    parseLocalDate(
+                        schedule.date
+                    );
+
+
+                return (
+                    date.getTime() ===
+                    today.getTime()
+                );
+            }
+        );
+    }
+
+
+    if (
+        scheduleFilter ===
+        "next7"
+    ) {
+
+        const endDate =
+            addDays(
+                today,
+                6
+            );
+
+
+        return data.filter(
+            schedule => {
+
+                const date =
+                    parseLocalDate(
+                        schedule.date
+                    );
+
+
+                return (
+                    date >= today
+                    &&
+                    date <= endDate
+                );
+            }
+        );
+    }
+
+
+    if (
+        scheduleFilter ===
+        "nextMonth"
+    ) {
+
+        const firstDayNextMonth =
+            new Date(
+                today.getFullYear(),
+                today.getMonth() + 1,
+                1
+            );
+
+
+        const firstDayAfterNextMonth =
+            new Date(
+                today.getFullYear(),
+                today.getMonth() + 2,
+                1
+            );
+
+
+        return data.filter(
+            schedule => {
+
+                const date =
+                    parseLocalDate(
+                        schedule.date
+                    );
+
+
+                return (
+                    date >=
+                    firstDayNextMonth
+                    &&
+                    date <
+                    firstDayAfterNextMonth
+                );
+            }
+        );
+    }
+
+
+    // ALL
+    return data;
+}
 
 function normalizeDate(
     value
@@ -500,10 +671,14 @@ function renderSchedules() {
     }
 
 
+    const filteredSchedules =
+        filterSchedulesByPeriod(
+            schedules
+        );
+
+
     if (
-        !schedules
-        ||
-        schedules.length === 0
+        filteredSchedules.length === 0
     ) {
 
         body.innerHTML = `
@@ -529,19 +704,18 @@ function renderSchedules() {
     }
 
 
+   
+
+
     const sortedSchedules =
-        [...schedules].sort(
+        [...filteredSchedules].sort(
             (a, b) =>
-                new Date(
-                    normalizeDate(
-                        a.date
-                    )
+                parseLocalDate(
+                    a.date
                 )
                 -
-                new Date(
-                    normalizeDate(
-                        b.date
-                    )
+                parseLocalDate(
+                    b.date
                 )
         );
 
@@ -1250,7 +1424,375 @@ async function saveSchedule() {
         );
     }
 }
+/* =========================================================
+   INCIDENT HISTORY
+   ========================================================= */
 
+function renderIncidents() {
+
+    const body =
+        document.querySelector(
+            "#incidentBody"
+        );
+
+
+    if (!body) {
+        return;
+    }
+
+
+    const incidents =
+        schedules
+
+            .filter(
+                schedule =>
+
+                    Number(
+                        schedule.incidentCount ?? 0
+                    ) > 0
+
+                    ||
+
+                    (
+                        schedule.impactedPlatforms
+                        &&
+                        schedule.impactedPlatforms.trim() !== ""
+                    )
+
+                    ||
+
+                    (
+                        schedule.incidentDescription
+                        &&
+                        schedule.incidentDescription.trim() !== ""
+                    )
+            )
+
+            .sort(
+                (a, b) =>
+
+                    parseLocalDate(
+                        b.date
+                    )
+
+                    -
+
+                    parseLocalDate(
+                        a.date
+                    )
+            );
+
+
+    if (
+        incidents.length === 0
+    ) {
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td colspan="5"
+                    style="
+                        text-align:center;
+                        padding:35px;
+                        color:#8a93a5;
+                    ">
+
+                    No incidents recorded.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+    }
+
+
+    body.innerHTML =
+
+        incidents
+
+            .map(
+                schedule => `
+
+                    <tr>
+
+
+                        <td>
+
+                            <div class="cell-date">
+
+                                ${escapeHtml(
+                    formatDate(
+                        schedule.date
+                    )
+                )}
+
+                            </div>
+
+
+                            <div class="cell-day">
+
+                                ${escapeHtml(
+                    getDayName(
+                        schedule.date
+                    )
+                )}
+
+                            </div>
+
+                        </td>
+
+
+
+                        <td>
+
+                            <div class="who">
+
+                                <span class="dot p">
+                                </span>
+
+                                <span class="who-name">
+
+                                    ${escapeHtml(
+                    schedule.primaryName
+                    ||
+                    "Unassigned"
+                )}
+
+                                </span>
+
+                            </div>
+
+                        </td>
+
+
+
+                        <td>
+
+                            <span class="badge badge-red">
+
+                                ${escapeHtml(
+                    schedule.incidentCount
+                    ??
+                    0
+                )}
+
+                            </span>
+
+                        </td>
+
+
+
+                        <td>
+
+                            ${escapeHtml(
+                    schedule.impactedPlatforms
+                    ||
+                    "—"
+                )}
+
+                        </td>
+
+
+
+                        <td>
+
+                            ${escapeHtml(
+                    schedule.incidentDescription
+                    ||
+                    "—"
+                )}
+
+                        </td>
+
+
+                    </tr>
+
+                `
+            )
+
+            .join("");
+}
+
+
+/* =========================================================
+   SWAP HISTORY
+   ========================================================= */
+
+function renderSwapHistory() {
+
+    const body =
+        document.querySelector(
+            "#swapHistoryBody"
+        );
+
+
+    if (!body) {
+        return;
+    }
+
+
+    const swaps =
+        schedules
+
+            .filter(
+                schedule =>
+
+                    schedule.swapNote
+                    &&
+                    schedule.swapNote
+                        .toString()
+                        .trim() !== ""
+            )
+
+            .sort(
+                (a, b) =>
+
+                    parseLocalDate(
+                        b.date
+                    )
+
+                    -
+
+                    parseLocalDate(
+                        a.date
+                    )
+            );
+
+
+    if (
+        swaps.length === 0
+    ) {
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td colspan="4"
+                    style="
+                        text-align:center;
+                        padding:35px;
+                        color:#8a93a5;
+                    ">
+
+                    No swap history recorded.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+    }
+
+
+    body.innerHTML =
+
+        swaps
+
+            .map(
+                schedule => `
+
+                    <tr>
+
+
+                        <td>
+
+                            <div class="cell-date">
+
+                                ${escapeHtml(
+                    formatDate(
+                        schedule.date
+                    )
+                )}
+
+                            </div>
+
+
+                            <div class="cell-day">
+
+                                ${escapeHtml(
+                    getDayName(
+                        schedule.date
+                    )
+                )}
+
+                            </div>
+
+                        </td>
+
+
+
+                        <td>
+
+                            <div class="who">
+
+                                <span class="dot p">
+                                </span>
+
+                                <span class="who-name">
+
+                                    ${escapeHtml(
+                    schedule.primaryName
+                    ||
+                    "Unassigned"
+                )}
+
+                                </span>
+
+                            </div>
+
+                        </td>
+
+
+
+                        <td>
+
+                            <div class="who">
+
+                                <span class="dot s">
+                                </span>
+
+                                <span class="who-name">
+
+                                    ${escapeHtml(
+                    schedule.secondaryName
+                    ||
+                    "Unassigned"
+                )}
+
+                                </span>
+
+                            </div>
+
+                        </td>
+
+
+
+                        <td>
+
+                            <span class="swap-note">
+
+                                ${escapeHtml(
+                    schedule.swapNote
+                )}
+
+                            </span>
+
+                        </td>
+
+
+                    </tr>
+
+                `
+            )
+
+            .join("");
+}
 
 /* =========================================================
    REFRESH ALL REAL MANAGER DATA
@@ -1267,6 +1809,12 @@ async function refreshManagerData() {
         ]);
 
 
+        console.log(
+            "Schedules received:",
+            schedules
+        );
+
+
         renderDashboard();
 
         renderManagerInfo();
@@ -1274,6 +1822,10 @@ async function refreshManagerData() {
         renderTeamMembers();
 
         renderSchedules();
+
+        renderIncidents();
+
+        renderSwapHistory();
 
     }
     catch (error) {
@@ -1682,6 +2234,49 @@ function updateClock() {
             }
         ).format(now);
 }
+/* =========================================================
+   SCHEDULE FILTER BUTTONS
+   ========================================================= */
+
+document
+    .querySelectorAll(
+        ".filter-btn"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    scheduleFilter =
+                        button.dataset.filter;
+
+
+                    document
+                        .querySelectorAll(
+                            ".filter-btn"
+                        )
+                        .forEach(
+                            item => {
+
+                                item.classList.remove(
+                                    "active"
+                                );
+                            }
+                        );
+
+
+                    button.classList.add(
+                        "active"
+                    );
+
+
+                    renderSchedules();
+                }
+            );
+        }
+    );
 
 
 /* =========================================================
@@ -1693,13 +2288,26 @@ async function initializePage() {
     updateClock();
 
 
+    // Update clock every minute
     setInterval(
         updateClock,
         60000
     );
 
 
+    // Load manager data immediately
     await refreshManagerData();
+
+
+    // Refresh schedules/team/dashboard every 30 seconds
+    setInterval(
+        async () => {
+
+            await refreshManagerData();
+
+        },
+        30000
+    );
 }
 
 

@@ -227,11 +227,17 @@ public class ManagerService
 
     // =========================================================
     // GET ON-CALL SCHEDULES
+    //
+    // Includes:
+    // - Primary / Secondary
+    // - Day Type
+    // - Primary Status
+    // - Swap Note
+    // - Incident information
     // =========================================================
 
     public async Task<List<OnCallDto>>
         GetOnCallsAsync(
-
             string managerEmployeeId)
     {
         var editor =
@@ -263,6 +269,10 @@ public class ManagerService
                     Date =
                         x.Date,
 
+                    DayType =
+                        x.DayType,
+
+
                     PrimaryEmployeeId =
                         x.PrimaryEmployeeId,
 
@@ -271,13 +281,31 @@ public class ManagerService
                             ? x.PrimaryEmployee.Name
                             : "Unassigned",
 
+                    PrimaryStatus =
+                        x.PrimaryStatus,
+
+
                     SecondaryEmployeeId =
                         x.SecondaryEmployeeId,
 
                     SecondaryName =
                         x.SecondaryEmployee != null
                             ? x.SecondaryEmployee.Name
-                            : "Unassigned"
+                            : "Unassigned",
+
+
+                    SwapNote =
+                        x.SwapNote,
+
+
+                    IncidentCount =
+                        x.IncidentCount,
+
+                    ImpactedPlatforms =
+                        x.ImpactedPlatforms,
+
+                    IncidentDescription =
+                        x.IncidentDescription
                 })
 
             .ToListAsync();
@@ -675,6 +703,9 @@ public class ManagerService
 
     // =========================================================
     // GET SINGLE ON-CALL
+    //
+    // Used after create/update.
+    // Includes all imported metadata too.
     // =========================================================
 
     private async Task<OnCallDto>
@@ -709,6 +740,10 @@ public class ManagerService
             Date =
                 schedule.Date,
 
+            DayType =
+                schedule.DayType,
+
+
             PrimaryEmployeeId =
                 schedule.PrimaryEmployeeId,
 
@@ -717,13 +752,31 @@ public class ManagerService
                     ? schedule.PrimaryEmployee.Name
                     : "Unassigned",
 
+            PrimaryStatus =
+                schedule.PrimaryStatus,
+
+
             SecondaryEmployeeId =
                 schedule.SecondaryEmployeeId,
 
             SecondaryName =
                 schedule.SecondaryEmployee != null
                     ? schedule.SecondaryEmployee.Name
-                    : "Unassigned"
+                    : "Unassigned",
+
+
+            SwapNote =
+                schedule.SwapNote,
+
+
+            IncidentCount =
+                schedule.IncidentCount,
+
+            ImpactedPlatforms =
+                schedule.ImpactedPlatforms,
+
+            IncidentDescription =
+                schedule.IncidentDescription
         };
     }
 }

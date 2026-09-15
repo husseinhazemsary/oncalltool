@@ -19,7 +19,7 @@
 
 
     <link rel="stylesheet"
-          href="manager.css?v=20260915-5">
+          href="manager.css?v=20260915-6">
 
 </head>
 
@@ -62,10 +62,14 @@
 
 
 
-            <!-- NAVIGATION -->
+            <!-- ==================================================
+                 NAVIGATION
+                 ================================================== -->
 
             <nav>
 
+
+                <!-- OVERVIEW -->
 
                 <button class="nav-item active"
                         data-section="overviewSection">
@@ -85,6 +89,8 @@
                 </button>
 
 
+
+                <!-- MY TEAM -->
 
                 <button class="nav-item"
                         data-section="teamSection">
@@ -112,11 +118,70 @@
                 </button>
 
 
+
+                <!-- INCIDENTS -->
+
+                <button class="nav-item"
+                        data-section="incidentsSection">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2">
+
+                        <path d="M12 9v4">
+                        </path>
+
+                        <path d="M12 17h.01">
+                        </path>
+
+                        <path d="M10.3 3.8L2.4 18a2 2 0 001.8 3h15.6a2 2 0 001.8-3L13.7 3.8a2 2 0 00-3.4 0z">
+                        </path>
+
+                    </svg>
+
+                    Incidents
+
+                </button>
+
+
+
+                <!-- SWAP HISTORY -->
+
+                <button class="nav-item"
+                        data-section="swapHistorySection">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2">
+
+                        <path d="M7 7h11l-3-3">
+                        </path>
+
+                        <path d="M17 17H6l3 3">
+                        </path>
+
+                        <path d="M18 7l3 3-3 3">
+                        </path>
+
+                        <path d="M6 17l-3-3 3-3">
+                        </path>
+
+                    </svg>
+
+                    Swap History
+
+                </button>
+
+
             </nav>
 
 
 
-            <!-- SIDEBAR FOOTER -->
+            <!-- ==================================================
+                 SIDEBAR FOOTER
+                 ================================================== -->
 
             <div class="sidebar-footer">
 
@@ -165,6 +230,7 @@
 
                         </div>
 
+
                         <div class="user-role"
                              id="managerRole">
 
@@ -183,6 +249,7 @@
 
 
             </div>
+
 
         </aside>
 
@@ -253,6 +320,7 @@
 
                 </div>
 
+
             </div>
 
 
@@ -265,9 +333,7 @@
                      class="manager-section">
 
 
-                <!-- ==================================================
-                     PAGE HEADER
-                     ================================================== -->
+                <!-- PAGE HEADER -->
 
                 <div class="page-head">
 
@@ -297,12 +363,12 @@
 
 
 
-                    <!-- PAGE ACTION BUTTONS -->
+                    <!-- ACTION BUTTONS -->
 
                     <div class="page-actions">
 
 
-                        <!-- HIDDEN CSV FILE INPUT -->
+                        <!-- FILE INPUT -->
 
                         <input type="file"
                                id="scheduleFileInput"
@@ -311,7 +377,7 @@
 
 
 
-                        <!-- IMPORT CSV -->
+                        <!-- IMPORT SCHEDULE -->
 
                         <button type="button"
                                 class="btn-secondary"
@@ -324,15 +390,21 @@
                                  stroke-linecap="round"
                                  stroke-linejoin="round">
 
-                                <path d="M12 16V4"></path>
-                                <path d="M7 9l5-5 5 5"></path>
-                                <path d="M5 14v5h14v-5"></path>
+                                <path d="M12 16V4">
+                                </path>
+
+                                <path d="M7 9l5-5 5 5">
+                                </path>
+
+                                <path d="M5 14v5h14v-5">
+                                </path>
 
                             </svg>
 
                             Import Schedule
 
                         </button>
+
 
 
                         <!-- CREATE ON-CALL -->
@@ -357,6 +429,7 @@
 
 
                     </div>
+
 
                 </div>
 
@@ -391,7 +464,7 @@
 
 
 
-                    <!-- PRIMARY -->
+                    <!-- PRIMARY TODAY -->
 
                     <div class="card coverage-card">
 
@@ -401,7 +474,6 @@
 
 
                         <div class="coverage-person">
-
 
                             <div class="coverage-avatar p"
                                  id="primaryInitials">
@@ -422,14 +494,13 @@
 
                             </div>
 
-
                         </div>
 
                     </div>
 
 
 
-                    <!-- SECONDARY -->
+                    <!-- SECONDARY TODAY -->
 
                     <div class="card coverage-card secondary">
 
@@ -439,7 +510,6 @@
 
 
                         <div class="coverage-person">
-
 
                             <div class="coverage-avatar s"
                                  id="secondaryInitials">
@@ -459,7 +529,6 @@
                                 </div>
 
                             </div>
-
 
                         </div>
 
@@ -500,6 +569,7 @@
 
                     <div class="section-head">
 
+
                         <div>
 
                             <h2>
@@ -511,6 +581,52 @@
                             </p>
 
                         </div>
+
+
+
+                        <!-- DATE FILTERS -->
+
+                        <div class="schedule-filters">
+
+
+                            <button type="button"
+                                    class="filter-btn"
+                                    data-filter="today">
+
+                                Today
+
+                            </button>
+
+
+                            <button type="button"
+                                    class="filter-btn active"
+                                    data-filter="next7">
+
+                                Next 7 Days
+
+                            </button>
+
+
+                            <button type="button"
+                                    class="filter-btn"
+                                    data-filter="nextMonth">
+
+                                Next Month
+
+                            </button>
+
+
+                            <button type="button"
+                                    class="filter-btn"
+                                    data-filter="all">
+
+                                All
+
+                            </button>
+
+
+                        </div>
+
 
                     </div>
 
@@ -544,7 +660,6 @@
                                 </tr>
 
                             </thead>
-
 
 
                             <tbody id="myDepartmentBody">
@@ -598,9 +713,7 @@
 
 
                         <p class="page-description">
-
                             Manage scheduling privileges for your team members.
-
                         </p>
 
                     </div>
@@ -615,6 +728,7 @@
 
                     <div class="section-head">
 
+
                         <div>
 
                             <h2>
@@ -626,6 +740,7 @@
                             </p>
 
                         </div>
+
 
                     </div>
 
@@ -669,8 +784,241 @@
                             </thead>
 
 
-
                             <tbody id="teamMembersBody">
+                            </tbody>
+
+
+                        </table>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- ==================================================
+                 INCIDENTS
+                 ================================================== -->
+
+            <section id="incidentsSection"
+                     class="manager-section hidden">
+
+
+                <div class="page-head">
+
+
+                    <div>
+
+                        <div class="breadcrumb">
+
+                            Manager
+
+                            <span>
+                                ›
+                            </span>
+
+                            <b>
+                                Incidents
+                            </b>
+
+                        </div>
+
+
+                        <h1>
+                            Incidents
+                        </h1>
+
+
+                        <p class="page-description">
+                            Incidents reported during your team's on-call coverage.
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="section-card">
+
+
+                    <div class="section-head">
+
+
+                        <div>
+
+                            <h2>
+                                Incident history
+                            </h2>
+
+                            <p>
+                                Imported and recorded incidents related to on-call schedules.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="table-scroll">
+
+
+                        <table>
+
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Date
+                                    </th>
+
+                                    <th>
+                                        Primary
+                                    </th>
+
+                                    <th>
+                                        Incidents
+                                    </th>
+
+                                    <th>
+                                        Impacted platforms
+                                    </th>
+
+                                    <th>
+                                        Description
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="incidentBody">
+                            </tbody>
+
+
+                        </table>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- ==================================================
+                 SWAP HISTORY
+                 ================================================== -->
+
+            <section id="swapHistorySection"
+                     class="manager-section hidden">
+
+
+                <div class="page-head">
+
+
+                    <div>
+
+                        <div class="breadcrumb">
+
+                            Manager
+
+                            <span>
+                                ›
+                            </span>
+
+                            <b>
+                                Swap History
+                            </b>
+
+                        </div>
+
+
+                        <h1>
+                            Swap History
+                        </h1>
+
+
+                        <p class="page-description">
+                            Review on-call swap activity for your team.
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="section-card">
+
+
+                    <div class="section-head">
+
+
+                        <div>
+
+                            <h2>
+                                Team swaps
+                            </h2>
+
+                            <p>
+                                Swap information imported or recorded against on-call schedules.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="table-scroll">
+
+
+                        <table>
+
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Date
+                                    </th>
+
+                                    <th>
+                                        Primary
+                                    </th>
+
+                                    <th>
+                                        Secondary
+                                    </th>
+
+                                    <th>
+                                        Swap details
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="swapHistoryBody">
                             </tbody>
 
 
@@ -832,7 +1180,7 @@
          JAVASCRIPT
          ================================================== -->
 
-    <script src="manager.js?v=20260915-5"></script>
+    <script src="manager.js?v=20260915-6"></script>
 
 
 </body>
