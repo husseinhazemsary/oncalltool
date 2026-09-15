@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#ff7900" />
+  <title>On-Call | Employee</title>
+  <meta name="description" content="Employee on-call emergency support dashboard." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../shared/styles.css" />
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">O</span>
+      <span>On-Call</span>
+    </div>
+
+    <nav aria-label="Main navigation">
+      <button class="nav-item active"><span>⌂</span> Employee view</button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <button class="nav-item"><span>?</span> Help & support</button>
+
+      <div class="signed-in">
+        <span class="avatar small">AM</span>
+        <div>
+          <strong>Ahmed Mohamed</strong>
+          <small>Enterprise Solutions</small>
+        </div>
+        <span>⋮</span>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <button class="mobile-menu" aria-label="Open navigation">☰</button>
+
+      <div>
+        <span class="live-dot"></span>
+        <span class="coverage-label">Emergency coverage active</span>
+      </div>
+
+      <div class="top-actions">
+        <button class="icon-btn" aria-label="Notifications">
+          ♧
+          <span class="notification-dot"></span>
+        </button>
+        <span class="time" id="currentTime"></span>
+      </div>
+    </header>
+
+    <section id="employeePage" class="page active">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">EMERGENCY SUPPORT</p>
+          <h1>Who is on-call now?</h1>
+        </div>
+
+        <button class="secondary-btn" id="findTeamBtn">⌕ Find any team</button>
+      </div>
+
+      <div class="alert-strip">
+        <span class="pulse"></span>
+        <strong>Outside working hours</strong>
+        <span>On-call contacts are currently active for emergency support.</span>
+        <span class="strip-time">Coverage until 8:00 AM</span>
+      </div>
+
+      <div class="content-grid">
+        <div class="primary-column">
+          <section class="panel">
+            <div class="panel-head split">
+              <div>
+                <h2>Emergency contacts</h2>
+                <p>Your preferred teams · updated live</p>
+              </div>
+
+              <div class="segmented">
+                <button class="active" data-view="now">On-call now</button>
+                <button data-view="week">Next 7 days</button>
+              </div>
+            </div>
+
+            <div class="search-row">
+              <label class="search">
+                <span>⌕</span>
+                <input id="contactSearch" placeholder="Search preferred teams..." />
+              </label>
+              <button class="filter-btn">All departments⌄</button>
+            </div>
+
+            <div id="nowView" class="contacts-list"></div>
+            <div id="weekView" class="schedule-wrap hidden"></div>
+          </section>
+
+          <section class="panel preferred-panel">
+            <div class="panel-head split">
+              <div>
+                <h2>My preferred teams</h2>
+                <p>Quick access to teams you work with most</p>
+              </div>
+
+              <button class="primary-btn" id="addTeamBtn">+ Add preferred team</button>
+            </div>
+
+            <div class="chips" id="preferredChips"></div>
+          </section>
+        </div>
+
+        <aside class="right-column">
+          <section class="panel my-oncall">
+            <div class="panel-head">
+              <p class="eyebrow">MY ON-CALL</p>
+              <h2>Your next duty</h2>
+            </div>
+
+            <div class="date-block">
+              <div class="date-card">
+                <strong>14</strong>
+                <span>SEP</span>
+              </div>
+
+              <div>
+                <strong>Monday</strong>
+                <span>Today · 6:00 PM – 8:00 AM</span>
+              </div>
+            </div>
+
+            <div class="duty-team">
+              <span class="team-icon dark">E</span>
+              <div>
+                <small>TEAM</small>
+                <strong>ERP Applications</strong>
+              </div>
+            </div>
+
+            <button class="primary-btn full" id="swapBtn">⇄ Change on-call</button>
+
+            <div class="upcoming">
+              <span>UPCOMING</span>
+              <div>
+                <strong>14 Sep</strong>
+                <small>ERP Applications</small>
+              </div>
+              <div>
+                <strong>18 Sep</strong>
+                <small>ERP Applications</small>
+              </div>
+            </div>
+          </section>
+
+          <section class="support-note">
+            <span>!</span>
+            <div>
+              <strong>Critical emergency?</strong>
+              <p>If you cannot reach the on-call employee, contact the Service Desk escalation line.</p>
+              <a href="tel:16000">Call Service Desk →</a>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop hidden" id="teamModal">
+    <div class="modal">
+      <button class="close-modal" aria-label="Close">×</button>
+      <p class="eyebrow">TEAM DIRECTORY</p>
+      <h2>Add preferred team</h2>
+      <p>Search by team name, department, or business area.</p>
+
+      <label class="search modal-search">
+        <span>⌕</span>
+        <input id="teamSearch" autofocus placeholder="Search team..." />
+      </label>
+
+      <div class="modal-filters">
+        <button class="filter-btn">All departments⌄</button>
+        <button class="filter-btn">All business areas⌄</button>
+      </div>
+
+      <div id="teamResults" class="team-results"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="swapModal">
+    <div class="modal swap-modal">
+      <button class="close-modal" aria-label="Close">×</button>
+      <p class="eyebrow">ERP APPLICATIONS</p>
+      <h2>Change your on-call coverage</h2>
+
+      <label class="field-label" for="dutySelect">Select one duty to change from the next 30 days</label>
+
+      <select id="dutySelect"></select>
+
+      <div class="current-duty" id="selectedDuty"></div>
+
+      <label class="field-label" for="swapSelect">Select your replacement</label>
+
+      <select id="swapSelect">
+        <option value="Mohamed Hassan">Mohamed Hassan</option>
+        <option value="Sara Ibrahim">Sara Ibrahim</option>
+        <option value="Omar Khalil">Omar Khalil</option>
+      </select>
+
+      <div class="current-duty" id="swapPreview"></div>
+
+      <div class="warning">
+        ! Please confirm that you have already arranged this change with the selected employee.
+      </div>
+
+      <button class="primary-btn full" id="confirmSwap">Confirm replacement</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="coverageModal">
+    <div class="modal">
+      <button class="close-modal" aria-label="Close">×</button>
+      <p class="eyebrow" id="coverageTeam"></p>
+      <h2 id="coverageDate"></h2>
+      <div id="coverageDetails"></div>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast">✓ On-call replacement saved successfully</div>
+
+  <script src="js/employee.js"></script>
+</body>
+</html>

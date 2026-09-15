@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "i43j5Et/zU4=",
+  "success": true,
+  "projectFilePath": "/Users/ali/Downloads/oncalltool2/oncalltool.csproj",
+  "expectedPackageFiles": [
+    "/Users/ali/.nuget/packages/microsoft.aspnetcore.openapi/10.0.11/microsoft.aspnetcore.openapi.10.0.11.nupkg.sha512",
+    "/Users/ali/.nuget/packages/microsoft.openapi/2.7.5/microsoft.openapi.2.7.5.nupkg.sha512"
+  ],
+  "logs": []
+}
