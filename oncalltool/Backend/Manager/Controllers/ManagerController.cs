@@ -382,19 +382,16 @@ public class ManagerController : ControllerBase
         }
     }
     // =========================================================
-    // IMPORT ON-CALL CSV
-    //
-    // POST:
-    // /api/manager/oncalls/import-csv
-    // ?managerEmployeeId=EMP1001
+    // IMPORT SCHEDULE
+    // CSV OR XLSX
     // =========================================================
 
-    [HttpPost("oncalls/import-csv")]
-    public async Task<IActionResult> ImportOnCallCsv(
+    [HttpPost("oncalls/import-schedule")]
+    public async Task<IActionResult> ImportSchedule(
         [FromQuery] string managerEmployeeId,
         IFormFile file,
         [FromServices]
-    CsvOnCallImportService csvImportService)
+    ScheduleImportService importService)
     {
         if (
             file == null
@@ -406,27 +403,28 @@ public class ManagerController : ControllerBase
                 new
                 {
                     message =
-                        "Please select a CSV file."
+                        "Please select a schedule file."
                 });
         }
 
 
         var extension =
             Path.GetExtension(
-                file.FileName);
+                file.FileName)
+                .ToLowerInvariant();
 
 
         if (
-            !extension.Equals(
-                ".csv",
-                StringComparison.OrdinalIgnoreCase)
+            extension != ".csv"
+            &&
+            extension != ".xlsx"
         )
         {
             return BadRequest(
                 new
                 {
                     message =
-                        "Only CSV files are supported."
+                        "Only CSV and Excel (.xlsx) files are supported."
                 });
         }
 
@@ -438,9 +436,10 @@ public class ManagerController : ControllerBase
 
 
             var result =
-                await csvImportService.ImportAsync(
+                await importService.ImportAsync(
                     managerEmployeeId,
-                    stream);
+                    stream,
+                    extension);
 
 
             if (!result.Success)

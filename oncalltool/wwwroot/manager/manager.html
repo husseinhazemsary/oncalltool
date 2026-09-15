@@ -2,12 +2,14 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>On-Call — ERP Applications</title>
+    <title>On-Call — Manager</title>
+
 
     <link rel="preconnect"
           href="https://fonts.googleapis.com">
@@ -15,27 +17,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
           rel="stylesheet">
 
+
     <link rel="stylesheet"
-          href="manager.css">
+          href="manager.css?v=20260915-5">
+
 </head>
 
 
 <body>
 
+
     <div class="app">
 
 
-        <!-- =========================
+        <!-- ==================================================
              SIDEBAR
-             ========================= -->
+             ================================================== -->
 
         <aside class="sidebar">
+
+
+            <!-- BRAND -->
 
             <div class="brand">
 
                 <div class="brand-mark">
                     O
                 </div>
+
 
                 <div>
 
@@ -52,9 +61,11 @@
             </div>
 
 
+
+            <!-- NAVIGATION -->
+
             <nav>
 
-                <!-- OVERVIEW -->
 
                 <button class="nav-item active"
                         data-section="overviewSection">
@@ -64,7 +75,8 @@
                          stroke="currentColor"
                          stroke-width="2">
 
-                        <path d="M3 11l9-8 9 8M5 10v10h14V10" />
+                        <path d="M3 11l9-8 9 8M5 10v10h14V10">
+                        </path>
 
                     </svg>
 
@@ -73,7 +85,6 @@
                 </button>
 
 
-                <!-- MY TEAM -->
 
                 <button class="nav-item"
                         data-section="teamSection">
@@ -85,11 +96,14 @@
 
                         <circle cx="9"
                                 cy="8"
-                                r="3.2" />
+                                r="3.2">
+                        </circle>
 
-                        <path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" />
+                        <path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6">
+                        </path>
 
-                        <path d="M16.5 6.5a3 3 0 010 5.8M20 20c0-2.8-1.9-4.9-4.5-5.6" />
+                        <path d="M16.5 6.5a3 3 0 010 5.8M20 20c0-2.8-1.9-4.9-4.5-5.6">
+                        </path>
 
                     </svg>
 
@@ -97,12 +111,15 @@
 
                 </button>
 
+
             </nav>
+
 
 
             <!-- SIDEBAR FOOTER -->
 
             <div class="sidebar-footer">
+
 
                 <div class="help-link">
 
@@ -115,9 +132,11 @@
 
                         <circle cx="12"
                                 cy="12"
-                                r="9" />
+                                r="9">
+                        </circle>
 
-                        <path d="M9.5 9a2.5 2.5 0 015 .3c0 1.7-2.5 1.9-2.5 3.7M12 17h.01" />
+                        <path d="M9.5 9a2.5 2.5 0 015 .3c0 1.7-2.5 1.9-2.5 3.7M12 17h.01">
+                        </path>
 
                     </svg>
 
@@ -126,31 +145,42 @@
                 </div>
 
 
+
                 <div class="user-card">
 
                     <div class="avatar avatar-amber"
                          id="managerAvatar">
+
                         —
+
                     </div>
+
 
                     <div>
 
                         <div class="user-name"
                              id="managerName">
+
                             Loading...
+
                         </div>
 
                         <div class="user-role"
                              id="managerRole">
+
                             Manager
+
                         </div>
 
                     </div>
+
+
                     <div class="user-dots">
                         ⋮
                     </div>
 
                 </div>
+
 
             </div>
 
@@ -158,27 +188,33 @@
 
 
 
-        <!-- =========================
+        <!-- ==================================================
              MAIN CONTENT
-             ========================= -->
+             ================================================== -->
 
         <main>
 
 
-            <!-- TOP BAR -->
+            <!-- ==================================================
+                 TOP BAR
+                 ================================================== -->
 
             <div class="topbar">
 
+
                 <div class="status-pill">
 
-                    <span class="pulse-dot"></span>
+                    <span class="pulse-dot">
+                    </span>
 
                     Emergency coverage active
 
                 </div>
 
 
+
                 <div class="topbar-right">
+
 
                     <button class="bell"
                             aria-label="Notifications">
@@ -190,13 +226,16 @@
                              stroke="currentColor"
                              stroke-width="2">
 
-                            <path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                            <path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9">
+                            </path>
 
-                            <path d="M13.7 21a2 2 0 01-3.4 0" />
+                            <path d="M13.7 21a2 2 0 01-3.4 0">
+                            </path>
 
                         </svg>
 
                     </button>
+
 
 
                     <div class="clock">
@@ -210,6 +249,7 @@
                         </div>
 
                     </div>
+
 
                 </div>
 
@@ -225,9 +265,12 @@
                      class="manager-section">
 
 
-                <!-- PAGE TITLE -->
+                <!-- ==================================================
+                     PAGE HEADER
+                     ================================================== -->
 
                 <div class="page-head">
+
 
                     <div>
 
@@ -235,7 +278,9 @@
 
                             Manager
 
-                            <span>›</span>
+                            <span>
+                                ›
+                            </span>
 
                             <b id="departmentBreadcrumb">
                                 Loading...
@@ -251,29 +296,75 @@
                     </div>
 
 
-                    <button class="btn-primary"
-                            id="createScheduleBtn">
 
-                        <svg viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2.4">
+                    <!-- PAGE ACTION BUTTONS -->
 
-                            <path d="M12 5v14M5 12h14" />
+                    <div class="page-actions">
 
-                        </svg>
 
-                        Create on-call
+                        <!-- HIDDEN CSV FILE INPUT -->
 
-                    </button>
+                        <input type="file"
+                               id="scheduleFileInput"
+                               accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                               hidden>
+
+
+
+                        <!-- IMPORT CSV -->
+
+                        <button type="button"
+                                class="btn-secondary"
+                                id="importScheduleBtn">
+
+                            <svg viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+
+                                <path d="M12 16V4"></path>
+                                <path d="M7 9l5-5 5 5"></path>
+                                <path d="M5 14v5h14v-5"></path>
+
+                            </svg>
+
+                            Import Schedule
+
+                        </button>
+
+
+                        <!-- CREATE ON-CALL -->
+
+                        <button type="button"
+                                class="btn-primary"
+                                id="createScheduleBtn">
+
+                            <svg viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2.4">
+
+                                <path d="M12 5v14M5 12h14">
+                                </path>
+
+                            </svg>
+
+                            Create on-call
+
+                        </button>
+
+
+                    </div>
 
                 </div>
 
 
 
-                <!-- =========================
-                     STAT CARDS
-                     ========================= -->
+                <!-- ==================================================
+                     DASHBOARD CARDS
+                     ================================================== -->
 
                 <div class="stat-row">
 
@@ -311,6 +402,7 @@
 
                         <div class="coverage-person">
 
+
                             <div class="coverage-avatar p"
                                  id="primaryInitials">
                                 —
@@ -330,6 +422,7 @@
 
                             </div>
 
+
                         </div>
 
                     </div>
@@ -346,6 +439,7 @@
 
 
                         <div class="coverage-person">
+
 
                             <div class="coverage-avatar s"
                                  id="secondaryInitials">
@@ -365,6 +459,7 @@
                                 </div>
 
                             </div>
+
 
                         </div>
 
@@ -396,11 +491,12 @@
 
 
 
-                <!-- =========================
+                <!-- ==================================================
                      TEAM COVERAGE
-                     ========================= -->
+                     ================================================== -->
 
                 <div class="section-card">
+
 
                     <div class="section-head">
 
@@ -419,9 +515,12 @@
                     </div>
 
 
+
                     <div class="table-scroll">
 
+
                         <table>
+
 
                             <thead>
 
@@ -439,21 +538,27 @@
                                         Secondary
                                     </th>
 
-                                    <th></th>
+                                    <th>
+                                    </th>
 
                                 </tr>
 
                             </thead>
 
 
+
                             <tbody id="myDepartmentBody">
                             </tbody>
 
+
                         </table>
+
 
                     </div>
 
+
                 </div>
+
 
             </section>
 
@@ -469,13 +574,16 @@
 
                 <div class="page-head">
 
+
                     <div>
 
                         <div class="breadcrumb">
 
                             Manager
 
-                            <span>›</span>
+                            <span>
+                                ›
+                            </span>
 
                             <b>
                                 My Team
@@ -490,10 +598,13 @@
 
 
                         <p class="page-description">
+
                             Manage scheduling privileges for your team members.
+
                         </p>
 
                     </div>
+
 
                 </div>
 
@@ -519,9 +630,12 @@
                     </div>
 
 
+
                     <div class="table-scroll">
 
+
                         <table>
+
 
                             <thead>
 
@@ -547,26 +661,33 @@
                                         Schedule privilege
                                     </th>
 
-                                    <th></th>
+                                    <th>
+                                    </th>
 
                                 </tr>
 
                             </thead>
 
 
+
                             <tbody id="teamMembersBody">
                             </tbody>
 
+
                         </table>
+
 
                     </div>
 
+
                 </div>
+
 
             </section>
 
 
         </main>
+
 
     </div>
 
@@ -598,16 +719,25 @@
 
             <div class="modal-badge"
                  id="modalDepartment">
+
                 TEAM
+
             </div>
 
+
+
             <h2 id="scheduleModalTitle">
+
                 Create on-call
+
             </h2>
 
 
+
             <p class="modal-description">
+
                 Assign the Primary and Secondary on-call employees.
+
             </p>
 
 
@@ -672,7 +802,8 @@
 
             <!-- SAVE -->
 
-            <button class="btn-primary modal-save"
+            <button type="button"
+                    class="btn-primary modal-save"
                     id="saveScheduleBtn">
 
                 Save on-call
@@ -682,11 +813,14 @@
 
         </div>
 
+
     </div>
 
 
 
-    <!-- TOAST -->
+    <!-- ==================================================
+         TOAST
+         ================================================== -->
 
     <div class="toast hidden"
          id="toast">
@@ -694,7 +828,12 @@
 
 
 
-    <script src="manager.js?v=20260915-3"></script>
+    <!-- ==================================================
+         JAVASCRIPT
+         ================================================== -->
+
+    <script src="manager.js?v=20260915-5"></script>
+
 
 </body>
 

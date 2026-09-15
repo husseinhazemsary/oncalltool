@@ -5,7 +5,7 @@ using oncalltool.Backend.Manager.Services;
 using oncalltool.Backend.Common.Demo;
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.Services.AddScoped<ScheduleImportService>();
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();

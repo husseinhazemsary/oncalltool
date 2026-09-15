@@ -1337,6 +1337,168 @@ function showSection(
             }
         );
 }
+/* =========================================================
+   IMPORT SCHEDULE
+   CSV OR XLSX
+   ========================================================= */
+
+document.querySelector(
+    "#importScheduleBtn"
+).onclick = () => {
+
+    document.querySelector(
+        "#scheduleFileInput"
+    ).click();
+};
+
+
+document.querySelector(
+    "#scheduleFileInput"
+).addEventListener(
+    "change",
+    async event => {
+
+        const input =
+            event.target;
+
+        const file =
+            input.files?.[0];
+
+
+        if (!file) {
+            return;
+        }
+
+
+        const fileName =
+            file.name.toLowerCase();
+
+
+        if (
+            !fileName.endsWith(".csv")
+            &&
+            !fileName.endsWith(".xlsx")
+        ) {
+
+            showToast(
+                "Please select a CSV or Excel file."
+            );
+
+            input.value = "";
+
+            return;
+        }
+
+
+        const button =
+            document.querySelector(
+                "#importScheduleBtn"
+            );
+
+
+        const originalHtml =
+            button.innerHTML;
+
+
+        try {
+
+            button.disabled = true;
+
+            button.innerHTML =
+                "Importing...";
+
+
+            const formData =
+                new FormData();
+
+
+            formData.append(
+                "file",
+                file
+            );
+
+
+            const response =
+                await fetch(
+
+                    `/api/manager/oncalls/import-schedule?managerEmployeeId=${encodeURIComponent(
+                        managerEmployeeId
+                    )}`,
+
+                    {
+                        method:
+                            "POST",
+
+                        body:
+                            formData
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                if (
+                    result.errors
+                    &&
+                    result.errors.length > 0
+                ) {
+
+                    console.error(
+                        result.errors
+                    );
+
+                    showToast(
+                        result.errors[0]
+                    );
+                }
+
+                else {
+
+                    showToast(
+                        result.message
+                        ||
+                        "Schedule import failed."
+                    );
+                }
+
+                return;
+            }
+
+
+            await refreshManagerData();
+
+
+            showToast(
+                `${result.importedRows} schedule rows imported successfully.`
+            );
+
+        }
+        catch (error) {
+
+            console.error(error);
+
+            showToast(
+                "Could not import the schedule file."
+            );
+
+        }
+        finally {
+
+            button.disabled =
+                false;
+
+            button.innerHTML =
+                originalHtml;
+
+            input.value =
+                "";
+        }
+    }
+);
 
 
 document

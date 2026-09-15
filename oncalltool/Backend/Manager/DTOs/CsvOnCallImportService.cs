@@ -21,27 +21,9 @@ public class CsvOnCallImportService
 
 
     // =========================================================
-    // CSV ROW MODEL
-    // =========================================================
-
-    private class CsvScheduleRow
-    {
-        public string Date { get; set; } = string.Empty;
-
-        public string PrimaryEmployeeId { get; set; } =
-            string.Empty;
-
-        public string SecondaryEmployeeId { get; set; } =
-            string.Empty;
-    }
-
-
-    // =========================================================
     // GET SCHEDULE EDITOR
     //
-    // Allowed:
-    // Manager
-    // OR Employee with SchedulePrivilege = true
+    // Manager OR employee with SchedulePrivilege.
     // =========================================================
 
     private async Task<AppUser> GetScheduleEditorAsync(
@@ -93,26 +75,24 @@ public class CsvOnCallImportService
             new CsvImportResultDto();
 
 
-        // -----------------------------------------------------
-        // READ CSV
-        // -----------------------------------------------------
-
-        using var reader =
-            new StreamReader(
-                fileStream);
-
-
         var config =
             new CsvConfiguration(
                 CultureInfo.InvariantCulture)
             {
                 HeaderValidated = null,
-                MissingFieldFound = null,
-                TrimOptions =
-                    TrimOptions.Trim,
 
-                BadDataFound = null
+                MissingFieldFound = null,
+
+                BadDataFound = null,
+
+                TrimOptions =
+                    TrimOptions.Trim
             };
+
+
+        using var reader =
+            new StreamReader(
+                fileStream);
 
 
         using var csv =
@@ -121,191 +101,248 @@ public class CsvOnCallImportService
                 config);
 
 
-        List<CsvScheduleRow> rows;
+        // =====================================================
+        // READ HEADER
+        // =====================================================
 
-
-        try
-        {
-            rows =
-                csv.GetRecords<CsvScheduleRow>()
-                    .ToList();
-        }
-        catch (Exception ex)
+        if (!await csv.ReadAsync())
         {
             throw new ArgumentException(
-                $"Could not read CSV file: {ex.Message}");
+                "The CSV file is empty.");
         }
 
 
-        result.TotalRows =
-            rows.Count;
-
-
-        if (rows.Count == 0)
-        {
-            throw new ArgumentException(
-                "The CSV file does not contain any schedule rows.");
-        }
+        csv.ReadHeader();
 
 
         // =====================================================
-        // LOAD TEAM EMPLOYEES ONCE
+        // LOAD TEAM EMPLOYEES
+        //
+        // Manager is deliberately excluded from on-call.
         // =====================================================
 
-        var departmentEmployees =
+        var employees =
             await _db.Users
 
                 .Where(x =>
                     x.DepartmentId ==
-                    editor.DepartmentId)
+                        editor.DepartmentId
+                    &&
+                    x.Role != "Manager")
 
                 .ToListAsync();
 
 
-        var employeesByEmployeeId =
-            departmentEmployees
+        // Match CSV by employee NAME
+        var employeesByName =
+            employees
 
-                .Where(x =>
-                    !string.IsNullOrWhiteSpace(
-                        x.EmployeeId))
+                .GroupBy(
+                    x => x.Name.Trim(),
+                    StringComparer.OrdinalIgnoreCase)
 
                 .ToDictionary(
-                    x =>
-                        x.EmployeeId!,
-                    x =>
-                        x,
+                    x => x.Key,
+                    x => x.First(),
                     StringComparer.OrdinalIgnoreCase);
 
 
         // =====================================================
-        // LOAD EXISTING SCHEDULE DATES
+        // READ EXISTING SCHEDULES
         // =====================================================
 
-        var existingScheduleDates =
+        var existingSchedules =
             await _db.OnCallSchedules
 
                 .Where(x =>
                     x.DepartmentId ==
-                    editor.DepartmentId)
+                        editor.DepartmentId)
 
-                .Select(x =>
-                    x.Date.Date)
-
-                .ToListAsync();
+                .ToDictionaryAsync(
+                    x => x.Date.Date);
 
 
-        var existingDates =
-            existingScheduleDates
-                .ToHashSet();
-
-
-        // Keep track of duplicate dates inside the CSV itself.
         var csvDates =
             new HashSet<DateTime>();
 
 
-        // These are only added if the entire CSV is valid.
-        var schedulesToInsert =
+        var schedulesToCreate =
             new List<OnCallSchedule>();
 
 
+        var schedulesToUpdate =
+            new List<OnCallSchedule>();
+
+
+        var rowNumber =
+            1;
+
+
         // =====================================================
-        // VALIDATE EVERY ROW
+        // READ ROWS
         // =====================================================
 
-        for (
-            int index = 0;
-            index < rows.Count;
-            index++
+        while (
+            await csv.ReadAsync()
         )
         {
-            var row =
-                rows[index];
+            rowNumber++;
 
-
-            // +2 because:
-            // row 1 = header
-            // first record = row 2
-            var csvRowNumber =
-                index + 2;
+            result.TotalRows++;
 
 
             // -------------------------------------------------
             // DATE
             // -------------------------------------------------
 
-            if (
-                !DateTime.TryParse(
-                    row.Date,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out var parsedDate)
-            )
-            {
-                result.Errors.Add(
-                    $"Row {csvRowNumber}: Invalid date '{row.Date}'.");
+            var dateText =
+                GetField(
+                    csv,
+                    "Date");
 
-                continue;
-            }
-
-
-            var date =
-                parsedDate.Date;
-
-
-            // -------------------------------------------------
-            // PRIMARY EMPLOYEE ID
-            // -------------------------------------------------
 
             if (
                 string.IsNullOrWhiteSpace(
-                    row.PrimaryEmployeeId)
+                    dateText)
             )
             {
                 result.Errors.Add(
-                    $"Row {csvRowNumber}: PrimaryEmployeeId is required.");
+                    $"Row {rowNumber}: Date is required.");
 
                 continue;
             }
 
 
             if (
-                !employeesByEmployeeId.TryGetValue(
-                    row.PrimaryEmployeeId,
+                !TryParseDate(
+                    dateText,
+                    out var date)
+            )
+            {
+                result.Errors.Add(
+                    $"Row {rowNumber}: Invalid date '{dateText}'. Recommended format: yyyy-MM-dd.");
+
+                continue;
+            }
+
+
+            date =
+                date.Date;
+
+
+            // -------------------------------------------------
+            // DUPLICATE DATE INSIDE CSV
+            // -------------------------------------------------
+
+            if (
+                !csvDates.Add(
+                    date)
+            )
+            {
+                result.Errors.Add(
+                    $"Row {rowNumber}: Date {date:yyyy-MM-dd} appears more than once in the CSV.");
+
+                continue;
+            }
+
+
+            // -------------------------------------------------
+            // TYPE
+            //
+            // Working Day / Holiday / Week End
+            // -------------------------------------------------
+
+            var dayType =
+                NullIfEmpty(
+                    GetField(
+                        csv,
+                        "Type"));
+
+
+            // -------------------------------------------------
+            // PRIMARY
+            // -------------------------------------------------
+
+            var primaryName =
+                CleanName(
+                    GetField(
+                        csv,
+                        "Primary"));
+
+
+            if (
+                string.IsNullOrWhiteSpace(
+                    primaryName)
+            )
+            {
+                result.Errors.Add(
+                    $"Row {rowNumber}: Primary employee is required.");
+
+                continue;
+            }
+
+
+            if (
+                !employeesByName.TryGetValue(
+                    primaryName,
                     out var primaryEmployee)
             )
             {
                 result.Errors.Add(
-                    $"Row {csvRowNumber}: Primary employee '{row.PrimaryEmployeeId}' does not exist in this department.");
+                    $"Row {rowNumber}: Primary employee '{primaryName}' was not found in this team.");
 
                 continue;
             }
 
 
             // -------------------------------------------------
-            // SECONDARY EMPLOYEE ID
+            // PRIMARY STATUS
+            //
+            // Example: Vacation
             // -------------------------------------------------
+
+            var primaryStatus =
+                NullIfEmpty(
+                    GetField(
+                        csv,
+                        "Primary Status"));
+
+
+            // -------------------------------------------------
+            // SECONDARY
+            //
+            // Workbook spells this "Secondry".
+            // We support BOTH spellings.
+            // -------------------------------------------------
+
+            var secondaryName =
+                CleanName(
+                    GetFieldAny(
+                        csv,
+                        "Secondry",
+                        "Secondary"));
+
 
             if (
                 string.IsNullOrWhiteSpace(
-                    row.SecondaryEmployeeId)
+                    secondaryName)
             )
             {
                 result.Errors.Add(
-                    $"Row {csvRowNumber}: SecondaryEmployeeId is required.");
+                    $"Row {rowNumber}: Secondary employee is required.");
 
                 continue;
             }
 
 
             if (
-                !employeesByEmployeeId.TryGetValue(
-                    row.SecondaryEmployeeId,
+                !employeesByName.TryGetValue(
+                    secondaryName,
                     out var secondaryEmployee)
             )
             {
                 result.Errors.Add(
-                    $"Row {csvRowNumber}: Secondary employee '{row.SecondaryEmployeeId}' does not exist in this department.");
+                    $"Row {rowNumber}: Secondary employee '{secondaryName}' was not found in this team.");
 
                 continue;
             }
@@ -321,74 +358,196 @@ public class CsvOnCallImportService
             )
             {
                 result.Errors.Add(
-                    $"Row {csvRowNumber}: Primary and Secondary employees must be different.");
+                    $"Row {rowNumber}: Primary and Secondary employees must be different.");
 
                 continue;
             }
 
 
             // -------------------------------------------------
-            // EXISTING DATABASE DATE
+            // SWAP
+            //
+            // Example:
+            // Swap with Esraa
+            //
+            // Stored as information only.
+            // Does NOT automatically perform a swap.
             // -------------------------------------------------
 
+            var swapNote =
+                NullIfEmpty(
+                    GetField(
+                        csv,
+                        "Swap"));
+
+
+            // -------------------------------------------------
+            // INCIDENT COUNT
+            // -------------------------------------------------
+
+            var incidentText =
+                GetField(
+                    csv,
+                    "Incident Count");
+
+
+            var incidentCount =
+                0;
+
+
             if (
-                existingDates.Contains(
-                    date)
+                !string.IsNullOrWhiteSpace(
+                    incidentText)
+                &&
+                !int.TryParse(
+                    incidentText,
+                    out incidentCount)
             )
             {
                 result.Errors.Add(
-                    $"Row {csvRowNumber}: A schedule already exists for {date:yyyy-MM-dd}.");
+                    $"Row {rowNumber}: Incident Count '{incidentText}' is invalid.");
+
+                continue;
+            }
+
+
+            if (incidentCount < 0)
+            {
+                result.Errors.Add(
+                    $"Row {rowNumber}: Incident Count cannot be negative.");
 
                 continue;
             }
 
 
             // -------------------------------------------------
-            // DUPLICATE DATE INSIDE CSV
+            // INCIDENT INFORMATION
+            // -------------------------------------------------
+
+            var impactedPlatforms =
+                NullIfEmpty(
+                    GetField(
+                        csv,
+                        "Impacted Platforms"));
+
+
+            var incidentDescription =
+                NullIfEmpty(
+                    GetField(
+                        csv,
+                        "Incident Description"));
+
+
+            // -------------------------------------------------
+            // CREATE OR UPDATE
+            //
+            // Re-importing the CSV updates the same date
+            // instead of creating duplicate schedules.
             // -------------------------------------------------
 
             if (
-                !csvDates.Add(
-                    date)
+                existingSchedules.TryGetValue(
+                    date,
+                    out var existingSchedule)
             )
             {
-                result.Errors.Add(
-                    $"Row {csvRowNumber}: The date {date:yyyy-MM-dd} appears more than once in the CSV.");
+                existingSchedule.PrimaryEmployeeId =
+                    primaryEmployee.Id;
 
-                continue;
+
+                existingSchedule.SecondaryEmployeeId =
+                    secondaryEmployee.Id;
+
+
+                existingSchedule.DayType =
+                    dayType;
+
+
+                existingSchedule.PrimaryStatus =
+                    primaryStatus;
+
+
+                existingSchedule.SwapNote =
+                    swapNote;
+
+
+                existingSchedule.IncidentCount =
+                    incidentCount;
+
+
+                existingSchedule.ImpactedPlatforms =
+                    impactedPlatforms;
+
+
+                existingSchedule.IncidentDescription =
+                    incidentDescription;
+
+
+                existingSchedule.SourceSheet =
+                    "Manager CSV";
+
+
+                schedulesToUpdate.Add(
+                    existingSchedule);
             }
 
+            else
+            {
+                var schedule =
+                    new OnCallSchedule
+                    {
+                        DepartmentId =
+                            editor.DepartmentId,
 
-            // -------------------------------------------------
-            // VALID ROW
-            // -------------------------------------------------
+                        Date =
+                            date,
 
-            schedulesToInsert.Add(
-                new OnCallSchedule
-                {
-                    DepartmentId =
-                        editor.DepartmentId,
+                        PrimaryEmployeeId =
+                            primaryEmployee.Id,
 
-                    Date =
-                        date,
+                        SecondaryEmployeeId =
+                            secondaryEmployee.Id,
 
-                    PrimaryEmployeeId =
-                        primaryEmployee.Id,
+                        DayType =
+                            dayType,
 
-                    SecondaryEmployeeId =
-                        secondaryEmployee.Id,
+                        PrimaryStatus =
+                            primaryStatus,
 
-                    SourceSheet =
-                        "Manager CSV"
-                });
+                        SwapNote =
+                            swapNote,
+
+                        IncidentCount =
+                            incidentCount,
+
+                        ImpactedPlatforms =
+                            impactedPlatforms,
+
+                        IncidentDescription =
+                            incidentDescription,
+
+                        SourceSheet =
+                            "Manager CSV"
+                    };
+
+
+                schedulesToCreate.Add(
+                    schedule);
+
+
+                // Protect against duplicates later in same import
+                existingSchedules[
+                    date
+                ] = schedule;
+            }
         }
 
 
         // =====================================================
-        // IF ANY ERROR EXISTS:
+        // INVALID CSV
         //
-        // Do NOT insert partial data.
-        // Entire CSV is rejected.
+        // Atomic import:
+        // If ONE row is invalid, save NOTHING.
         // =====================================================
 
         if (
@@ -398,8 +557,10 @@ public class CsvOnCallImportService
             result.Success =
                 false;
 
+
             result.ImportedRows =
                 0;
+
 
             result.FailedRows =
                 result.Errors.Count;
@@ -409,8 +570,15 @@ public class CsvOnCallImportService
         }
 
 
+        if (result.TotalRows == 0)
+        {
+            throw new ArgumentException(
+                "The CSV contains no schedule rows.");
+        }
+
+
         // =====================================================
-        // SAVE ALL VALID ROWS
+        // SAVE
         // =====================================================
 
         await using var transaction =
@@ -420,9 +588,14 @@ public class CsvOnCallImportService
 
         try
         {
-            _db.OnCallSchedules
-                .AddRange(
-                    schedulesToInsert);
+            if (
+                schedulesToCreate.Count > 0
+            )
+            {
+                _db.OnCallSchedules
+                    .AddRange(
+                        schedulesToCreate);
+            }
 
 
             await _db.SaveChangesAsync();
@@ -431,6 +604,7 @@ public class CsvOnCallImportService
             await transaction
                 .CommitAsync();
         }
+
         catch
         {
             await transaction
@@ -443,13 +617,119 @@ public class CsvOnCallImportService
         result.Success =
             true;
 
+
         result.ImportedRows =
-            schedulesToInsert.Count;
+            schedulesToCreate.Count
+            +
+            schedulesToUpdate.Count;
+
 
         result.FailedRows =
             0;
 
 
         return result;
+    }
+
+
+    // =========================================================
+    // HEADER HELPER
+    // =========================================================
+
+    private static string GetField(
+        CsvReader csv,
+        string header)
+    {
+        try
+        {
+            return csv
+                .GetField(
+                    header)
+                ?.Trim()
+                ?? "";
+        }
+
+        catch
+        {
+            return "";
+        }
+    }
+
+
+    private static string GetFieldAny(
+        CsvReader csv,
+        params string[] headers)
+    {
+        foreach (
+            var header in headers
+        )
+        {
+            var value =
+                GetField(
+                    csv,
+                    header);
+
+
+            if (
+                !string.IsNullOrWhiteSpace(
+                    value)
+            )
+            {
+                return value;
+            }
+        }
+
+
+        return "";
+    }
+
+
+    // =========================================================
+    // DATE PARSER
+    // =========================================================
+
+    private static bool TryParseDate(
+        string value,
+        out DateTime date)
+    {
+        var formats =
+            new[]
+            {
+                "yyyy-MM-dd",
+                "M/d/yyyy",
+                "MM/dd/yyyy",
+                "d/M/yyyy",
+                "dd/MM/yyyy"
+            };
+
+
+        return DateTime.TryParseExact(
+            value.Trim(),
+            formats,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out date);
+    }
+
+
+    // =========================================================
+    // TEXT HELPERS
+    // =========================================================
+
+    private static string CleanName(
+        string value)
+    {
+        return value
+            .Trim();
+    }
+
+
+    private static string? NullIfEmpty(
+        string value)
+    {
+        return string.IsNullOrWhiteSpace(
+            value)
+            ? null
+            : value.Trim();
     }
 }
