@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using oncalltool.Backend.Common.Data;
 using oncalltool.Backend.Manager.Services;
+using oncalltool.Backend.Employee.Services;
 
 using oncalltool.Backend.Common.Demo;
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +23,7 @@ builder.Services.AddDbContext<AppDbContext>(
 
 builder.Services.AddScoped<ManagerService>();
 builder.Services.AddScoped<CsvOnCallImportService>();
-
+builder.Services.AddSingleton<EmployeeService>();
 
 var app = builder.Build();
 

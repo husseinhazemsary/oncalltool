@@ -1094,3 +1094,117 @@ th {
         width: 100%;
     }
 }
+/* Employee 7-day schedule layout */
+.content-grid.week-mode {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.content-grid.week-mode .right-column {
+  display: none;
+}
+
+.content-grid.week-mode .primary-column {
+  min-width: 0;
+}
+
+.content-grid.week-mode .schedule-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.content-grid.week-mode .schedule-wrap table {
+  width: 100%;
+  min-width: 1100px;
+  table-layout: fixed;
+}
+/* Employee 7-day schedule cells */
+
+.coverage-cell-button {
+    width: 100%;
+    min-width: 0;
+    padding: 8px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.coverage-cell-button:hover {
+    background: #fff7f0;
+}
+
+.week-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    padding: 5px 0;
+}
+
+.week-contact + .week-contact {
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid #eeeeee;
+}
+
+.week-contact strong {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    color: #1e1e1e;
+    font-size: 11px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.week-role {
+    width: fit-content;
+    padding: 3px 5px;
+    border-radius: 10px;
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.primary-week {
+    background: #fff0e1;
+    color: #bd5900;
+}
+
+.secondary-week {
+    background: #eeeeee;
+    color: #555555;
+}
+
+.content-grid.week-mode .schedule-wrap th,
+.content-grid.week-mode .schedule-wrap td {
+    vertical-align: top;
+}
+
+.content-grid.week-mode .schedule-wrap th:first-child,
+.content-grid.week-mode .schedule-wrap td:first-child {
+    width: 150px;
+    min-width: 150px;
+}
+
+.content-grid.week-mode .schedule-wrap th:not(:first-child),
+.content-grid.week-mode .schedule-wrap td:not(:first-child) {
+    width: 135px;
+    min-width: 135px;
+}
+
+/* Match the On-call now interaction to the 7-day coverage cells. */
+#nowView .contact-card[data-team] {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+#nowView .contact-card[data-team]:hover,
+#nowView .contact-card[data-team]:focus-visible {
+    background: #fff7f0;
+    outline: none;
+}

@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../shared/styles.css" />
+  <link rel="stylesheet" href="../shared/styles.css?v=3" />
 </head>
 
 <body>
@@ -62,7 +62,6 @@
         <div>
           <p class="eyebrow">EMERGENCY SUPPORT</p>
           <h1>Who is on-call now?</h1>
-          <p>Find the right person in seconds when an urgent issue happens.</p>
         </div>
 
         <button class="secondary-btn" id="findTeamBtn">⌕ Find any team</button>
@@ -125,12 +124,12 @@
 
             <div class="date-block">
               <div class="date-card">
-                <strong>09</strong>
+                <strong>14</strong>
                 <span>SEP</span>
               </div>
 
               <div>
-                <strong>Wednesday</strong>
+                <strong>Monday</strong>
                 <span>Today · 6:00 PM – 8:00 AM</span>
               </div>
             </div>
@@ -143,7 +142,7 @@
               </div>
             </div>
 
-            <button class="primary-btn full" id="swapBtn">⇄ Swap on-call</button>
+            <button class="primary-btn full" id="swapBtn">⇄ Change on-call</button>
 
             <div class="upcoming">
               <span>UPCOMING</span>
@@ -196,33 +195,43 @@
     <div class="modal swap-modal">
       <button class="close-modal" aria-label="Close">×</button>
       <p class="eyebrow">ERP APPLICATIONS</p>
-      <h2>Swap your on-call duty</h2>
+      <h2>Change your on-call coverage</h2>
 
-      <div class="current-duty">
-        <span>Your current duty</span>
-        <strong>Wednesday, 9 September</strong>
-      </div>
+      <label class="field-label" for="dutySelect">Select one duty to change from the next 30 days</label>
 
-      <label class="field-label" for="swapSelect">Swap with</label>
+      <select id="dutySelect"></select>
+
+      <div class="current-duty" id="selectedDuty"></div>
+
+      <label class="field-label" for="swapSelect">Select your replacement</label>
 
       <select id="swapSelect">
-        <option value="Mohamed Hassan|Thursday, 10 September">Mohamed Hassan — Thu, 10 Sep</option>
-        <option value="Sara Ibrahim|Friday, 11 September">Sara Ibrahim — Fri, 11 Sep</option>
-        <option value="Omar Khalil|Sunday, 13 September">Omar Khalil — Sun, 13 Sep</option>
+        <option value="Mohamed Hassan">Mohamed Hassan</option>
+        <option value="Sara Ibrahim">Sara Ibrahim</option>
+        <option value="Omar Khalil">Omar Khalil</option>
       </select>
 
-      <div class="swap-preview" id="swapPreview"></div>
+      <div class="current-duty" id="swapPreview"></div>
 
       <div class="warning">
-        ! This change immediately updates both schedules. No approval from the other employee is required.
+        ! Please confirm that you have already arranged this change with the selected employee.
       </div>
 
-      <button class="primary-btn full" id="confirmSwap">Confirm swap</button>
+      <button class="primary-btn full" id="confirmSwap">Confirm replacement</button>
     </div>
   </div>
 
-  <div class="toast hidden" id="toast">✓ On-call duty swapped successfully</div>
+  <div class="modal-backdrop hidden" id="coverageModal">
+    <div class="modal">
+      <button class="close-modal" aria-label="Close">×</button>
+      <p class="eyebrow" id="coverageTeam"></p>
+      <h2 id="coverageDate"></h2>
+      <div id="coverageDetails"></div>
+    </div>
+  </div>
 
-  <script src="js/employee.js"></script>
+  <div class="toast hidden" id="toast">✓ On-call replacement saved successfully</div>
+
+<script src="employee.js?v=5"></script>
 </body>
 </html>
