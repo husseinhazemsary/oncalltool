@@ -1,0 +1,322 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>On-Call — Admin</title>
+
+    <link rel="stylesheet" href="admin.css?v=1">
+    <script src="admin.js?v=1" defer></script>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="brand">
+                <div class="brand-mark">orange</div>
+
+                <div>
+                    <strong>On-Call</strong>
+                    <small>ADMIN CONTROL ROOM</small>
+                </div>
+            </div>
+
+            <nav>
+                <button class="nav-item active"
+                        data-view="overview">
+                    ⌂ &nbsp; Overview
+                </button>
+
+                <button class="nav-item"
+                        data-view="departments">
+                    ▦ &nbsp; Departments
+                </button>
+
+                <button class="nav-item"
+                        data-view="employees">
+                    ♧ &nbsp; Employees
+                </button>
+
+                <button class="nav-item"
+                        data-view="roles">
+                    ♢ &nbsp; Access & Roles
+                </button>
+            </nav>
+
+            <div class="sidebar-bottom">
+
+                <a href="/index.html" class="back-link">
+                    ← Switch dashboard
+                </a>
+
+                <div class="profile">
+                    <div class="avatar">H</div>
+                    <div>
+                        <strong>Hussein</strong>
+                        <small>Organization Admin</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN -->
+        <main class="main">
+
+            <header class="topbar">
+                <span class="status">● Organization administration</span>
+                <span class="top-label">ADMIN CONTROL ROOM</span>
+            </header>
+
+            <div id="message" class="message" role="status" hidden></div>
+
+
+            <!-- OVERVIEW -->
+            <section id="overview" class="view">
+
+                <div class="page-head">
+                    <div>
+                        <p class="breadcrumb">Admin › Overview</p>
+                        <h1>Organization Overview</h1>
+                        <p>Manage departments, employees and manager access.</p>
+                    </div>
+                </div>
+
+                <div class="stats">
+
+                    <div class="card">
+                        <span>Departments</span>
+                        <strong id="departmentCount">0</strong>
+                        <small>Teams across the organization</small>
+                    </div>
+
+                    <div class="card green">
+                        <span>Employees</span>
+                        <strong id="employeeCount">0</strong>
+                        <small>Including managers</small>
+                    </div>
+
+                    <div class="card orange">
+                        <span>Managers</span>
+                        <strong id="managerCount">0</strong>
+                        <small>With manager access</small>
+                    </div>
+
+                    <div class="card">
+                        <span>Needs a manager</span>
+                        <strong id="unassignedCount">0</strong>
+                        <small>Departments without a manager</small>
+                    </div>
+
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2>Department coverage</h2>
+                            <p>Current team structure and assigned managers</p>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Employees</th>
+                                    <th>Manager</th>
+                                </tr>
+                            </thead>
+                            <tbody id="overviewBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- DEPARTMENTS -->
+            <section id="departments" class="view" hidden>
+
+                <div class="page-head">
+                    <div>
+                        <p class="breadcrumb">Admin › Departments</p>
+                        <h1>Departments</h1>
+                        <p>Create and manage teams.</p>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">
+                        <h2>Create department</h2>
+                    </div>
+
+                    <form id="departmentForm" class="form-row">
+
+                        <label>
+                            Department name
+                            <input id="departmentName"
+                                   placeholder="e.g. Network Operations"
+                                   required>
+                        </label>
+
+                        <button type="submit" class="btn-dark">
+                            + Create department
+                        </button>
+
+                    </form>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">
+                        <h2>All departments</h2>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Employees</th>
+                                    <th>Manager</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="departmentsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- EMPLOYEES -->
+            <section id="employees" class="view" hidden>
+
+                <div class="page-head">
+                    <div>
+                        <p class="breadcrumb">Admin › Employees</p>
+                        <h1>Employees</h1>
+                        <p>Create, assign and manage employees.</p>
+                    </div>
+                </div>
+
+                <div class="panel">
+
+                    <div class="panel-head">
+                        <h2>Create employee</h2>
+                    </div>
+
+                    <form id="employeeForm" class="employee-form">
+
+                        <label>
+                            Employee ID
+                            <input id="newEmployeeId"
+                                   placeholder="EMP004"
+                                   required>
+                        </label>
+
+                        <label>
+                            Full name
+                            <input id="newEmployeeName"
+                                   placeholder="Employee name"
+                                   required>
+                        </label>
+
+                        <label>
+                            Email
+                            <input id="newEmployeeEmail"
+                                   type="email"
+                                   placeholder="Optional">
+                        </label>
+
+                        <label>
+                            Phone
+                            <input id="newEmployeePhone"
+                                   placeholder="Optional">
+                        </label>
+
+                        <label>
+                            Department
+                            <select id="newEmployeeDepartment"
+                                    required>
+                            </select>
+                        </label>
+
+                        <button type="submit" class="btn-dark">
+                            + Create employee
+                        </button>
+
+                    </form>
+
+                </div>
+
+                <div class="panel">
+
+                    <div class="panel-head">
+                        <h2>All employees</h2>
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Employee ID</th>
+                                    <th>Role</th>
+                                    <th>Department</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="employeesBody"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ACCESS AND ROLES -->
+            <section id="roles" class="view" hidden>
+
+                <div class="page-head">
+                    <div>
+                        <p class="breadcrumb">Admin › Access & Roles</p>
+                        <h1>Access & Roles</h1>
+                        <p>Assign or remove the manager for each department.</p>
+                    </div>
+                </div>
+
+                <div class="panel">
+
+                    <div class="panel-head">
+                        <div>
+                            <h2>Department managers</h2>
+                            <p>Each department can have one manager.</p>
+                        </div>
+                    </div>
+
+                    <div id="rolesBody"></div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+</html>

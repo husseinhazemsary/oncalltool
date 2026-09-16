@@ -1141,3 +1141,23 @@ tbody tr:hover {
         background: var(--ink);
         color: white;
     }
+
+/* ======================================
+   ORANGE BRANDING
+   ====================================== */
+
+.sidebar .brand-mark {
+    width: 88px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #ff7900;
+    color: #ffffff;
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.7px;
+    text-transform: lowercase;
+}

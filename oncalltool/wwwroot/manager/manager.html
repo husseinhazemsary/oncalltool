@@ -19,7 +19,7 @@
 
 
     <link rel="stylesheet"
-          href="manager.css?v=20260915-6">
+          href="manager.css?v=20260916-1">
 
 </head>
 
@@ -42,7 +42,7 @@
             <div class="brand">
 
                 <div class="brand-mark">
-                    O
+                    Orange
                 </div>
 
 
@@ -403,32 +403,51 @@
 
                             Import Schedule
 
-                        </button>
+                            <button type="button"
+                                    class="btn-secondary"
+                                    id="exportScheduleBtn">
+
+                                <svg viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round">
+
+                                    <path d="M12 4v12"></path>
+                                    <path d="M7 11l5 5 5-5"></path>
+                                    <path d="M5 17v3h14v-3"></path>
+
+                                </svg>
+
+                                Export Schedule
+
+                            </button>
 
 
 
-                        <!-- CREATE ON-CALL -->
+                            <!-- CREATE ON-CALL -->
 
-                        <button type="button"
-                                class="btn-primary"
-                                id="createScheduleBtn">
+                            <button type="button"
+                                    class="btn-primary"
+                                    id="createScheduleBtn">
 
-                            <svg viewBox="0 0 24 24"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 stroke-width="2.4">
+                                <svg viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="2.4">
 
-                                <path d="M12 5v14M5 12h14">
-                                </path>
+                                    <path d="M12 5v14M5 12h14">
+                                    </path>
 
-                            </svg>
+                                </svg>
 
-                            Create on-call
+                                Create on-call
 
-                        </button>
+                            </button>
 
 
-                    </div>
+</div>
 
 
                 </div>
@@ -811,35 +830,44 @@
 
                 <div class="page-head">
 
-
                     <div>
-
                         <div class="breadcrumb">
-
                             Manager
-
-                            <span>
-                                ›
-                            </span>
-
-                            <b>
-                                Incidents
-                            </b>
-
+                            <span>›</span>
+                            <b>Incidents</b>
                         </div>
 
-
-                        <h1>
-                            Incidents
-                        </h1>
-
+                        <h1>Incidents</h1>
 
                         <p class="page-description">
                             Incidents reported during your team's on-call coverage.
                         </p>
-
                     </div>
 
+                    <div class="page-actions">
+
+                        <button type="button"
+                                class="btn-secondary"
+                                id="exportIncidentsBtn">
+
+                            <svg viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+
+                                <path d="M12 4v12"></path>
+                                <path d="M7 11l5 5 5-5"></path>
+                                <path d="M5 17v3h14v-3"></path>
+
+                            </svg>
+
+                            Export Incidents
+
+                        </button>
+
+                    </div>
 
                 </div>
 
@@ -1180,7 +1208,7 @@
          JAVASCRIPT
          ================================================== -->
 
-    <script src="manager.js?v=20260915-6"></script>
+    <script src="manager.js?v=20260916-1"></script>
 
 
 </body>

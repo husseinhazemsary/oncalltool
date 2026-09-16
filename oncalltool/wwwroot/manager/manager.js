@@ -2280,6 +2280,279 @@ document
 
 
 /* =========================================================
+   CSV EXPORT HELPERS
+   ========================================================= */
+
+// Safely format CSV values for Excel and other spreadsheet apps.
+function csvCell(value) {
+
+    let text = String(value ?? "");
+
+    // Prevent spreadsheet applications from interpreting
+    // imported text as formulas.
+    if (/^[\s\x00-\x1f]*[=+\-@]/.test(text)) {
+        text = "'" + text;
+    }
+
+    // Escape quotation marks.
+    text = text.replaceAll('"', '""');
+
+    return `"${text}"`;
+}
+
+
+// Create and download a CSV file.
+function downloadCsv(filename, headers, rows) {
+
+    const csvLines = [
+
+        headers.map(csvCell).join(","),
+
+        ...rows.map(row =>
+            row.map(csvCell).join(",")
+        )
+
+    ];
+
+    const csvContent =
+        csvLines.join("\r\n");
+
+
+    // UTF-8 BOM improves Arabic/Unicode compatibility in Excel.
+    const blob = new Blob(
+        ["\uFEFF", csvContent],
+        {
+            type: "text/csv;charset=utf-8;"
+        }
+    );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const link =
+        document.createElement("a");
+
+
+    link.href = url;
+
+    link.download = filename;
+
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+
+    // Release the temporary browser URL.
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 1000);
+}
+
+
+/* =========================================================
+   EXPORT SCHEDULE
+   ========================================================= */
+
+function exportSchedules() {
+
+    // Export only the currently selected date period.
+    const filteredSchedules =
+        filterSchedulesByPeriod(schedules);
+
+
+    if (filteredSchedules.length === 0) {
+
+        showToast(
+            "No schedules available for the selected period."
+        );
+
+        return;
+    }
+
+
+    const sortedSchedules =
+        [...filteredSchedules].sort(
+            (a, b) =>
+                parseLocalDate(a.date)
+                -
+                parseLocalDate(b.date)
+        );
+
+
+    const headers = [
+
+        "Date",
+        "Day Type",
+        "Primary",
+        "Primary Status",
+        "Secondary",
+        "Swap Note",
+        "Incident Count",
+        "Impacted Platforms",
+        "Incident Description"
+
+    ];
+
+
+    const rows =
+        sortedSchedules.map(schedule => [
+
+            normalizeDate(schedule.date),
+
+            schedule.dayType ?? "",
+
+            schedule.primaryName ?? "",
+
+            schedule.primaryStatus ?? "",
+
+            schedule.secondaryName ?? "",
+
+            schedule.swapNote ?? "",
+
+            schedule.incidentCount ?? 0,
+
+            schedule.impactedPlatforms ?? "",
+
+            schedule.incidentDescription ?? ""
+
+        ]);
+
+
+    const filename =
+        `Enterprise_RA_Schedule_${scheduleFilter}_${getTodayISO()}.csv`;
+
+
+    downloadCsv(
+        filename,
+        headers,
+        rows
+    );
+}
+
+
+/* =========================================================
+   EXPORT INCIDENTS
+   ========================================================= */
+
+function exportIncidents() {
+
+    // Use all available incident records.
+    // The Overview date filter does not affect this page.
+    const incidents =
+
+        schedules
+
+            .filter(schedule =>
+
+                Number(schedule.incidentCount ?? 0) > 0
+
+                ||
+
+                Boolean(
+                    String(
+                        schedule.impactedPlatforms ?? ""
+                    ).trim()
+                )
+
+                ||
+
+                Boolean(
+                    String(
+                        schedule.incidentDescription ?? ""
+                    ).trim()
+                )
+
+            )
+
+            .sort(
+                (a, b) =>
+                    parseLocalDate(b.date)
+                    -
+                    parseLocalDate(a.date)
+            );
+
+
+    if (incidents.length === 0) {
+
+        showToast(
+            "No incidents available to export."
+        );
+
+        return;
+    }
+
+
+    const headers = [
+
+        "Date",
+        "Day Type",
+        "Primary",
+        "Secondary",
+        "Incident Count",
+        "Impacted Platforms",
+        "Incident Description"
+
+    ];
+
+
+    const rows =
+        incidents.map(schedule => [
+
+            normalizeDate(schedule.date),
+
+            schedule.dayType ?? "",
+
+            schedule.primaryName ?? "",
+
+            schedule.secondaryName ?? "",
+
+            schedule.incidentCount ?? 0,
+
+            schedule.impactedPlatforms ?? "",
+
+            schedule.incidentDescription ?? ""
+
+        ]);
+
+
+    const filename =
+        `Enterprise_RA_Incidents_${getTodayISO()}.csv`;
+
+
+    downloadCsv(
+        filename,
+        headers,
+        rows
+    );
+}
+
+
+/* =========================================================
+   EXPORT BUTTON EVENTS
+   ========================================================= */
+
+document
+    .querySelector("#exportScheduleBtn")
+    ?.addEventListener(
+        "click",
+        exportSchedules
+    );
+
+
+document
+    .querySelector("#exportIncidentsBtn")
+    ?.addEventListener(
+        "click",
+        exportIncidents
+    );
+
+
+/* =========================================================
    INITIAL LOAD
    ========================================================= */
 

@@ -1,18 +1,15 @@
-﻿<!DOCTYPE html>
-
+﻿
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
 
-    <meta name="viewport    
+    <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>
-        Orange On-Call
-    </title>
-
+    <title>Orange On-Call</title>
 
     <style>
 
@@ -22,49 +19,141 @@
 
         body {
             margin: 0;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             background: #f5f5f5;
             font-family: Arial, sans-serif;
+            padding: 20px;
         }
 
         .login-box {
             width: 400px;
+            max-width: 100%;
             background: white;
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
 
+        /* BRAND */
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .brand-logo {
+            background: #ff7900;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .brand-text {
+            text-align: left;
+        }
+
+            .brand-text strong {
+                display: block;
+                color: #171b29;
+                font-size: 20px;
+            }
+
+            .brand-text small {
+                display: block;
+                color: #888;
+                font-size: 10px;
+                margin-top: 4px;
+                letter-spacing: 2px;
+            }
+
+        /* TITLE */
+
         h1 {
-            margin-bottom: 10px;
+            margin: 0 0 10px;
+            color: #171b29;
+            font-size: 24px;
         }
 
         p {
             color: #777;
             margin-bottom: 30px;
+            font-size: 14px;
         }
 
-        a {
+        /* DASHBOARD BUTTONS */
+
+        .dashboard-btn {
             display: block;
-            padding: 15px;
+            padding: 17px;
             margin-top: 15px;
             text-decoration: none;
             border-radius: 8px;
+            font-size: 14px;
             font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
         }
+
+            .dashboard-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12);
+            }
+
+        /* EMPLOYEE */
 
         .employee {
             background: #ff7900;
             color: white;
         }
 
+            .employee:hover {
+                background: #e66d00;
+            }
+
+        /* MANAGER */
+
         .manager {
             background: #222;
             color: white;
+        }
+
+            .manager:hover {
+                background: #3a3a3a;
+            }
+
+        /* ADMIN */
+
+        .admin {
+            background: white;
+            color: #171b29;
+            border: 2px solid #ff7900;
+        }
+
+            .admin:hover {
+                background: #fff5eb;
+            }
+
+        /* FOOTER */
+
+        .footer {
+            margin-top: 30px;
+            color: #aaa;
+            font-size: 11px;
+        }
+
+        @media (max-width: 480px) {
+
+            .login-box {
+                padding: 25px;
+            }
         }
     </style>
 
@@ -73,36 +162,83 @@
 
 <body>
 
-
     <div class="login-box">
 
+
+        <!-- BRAND -->
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                orange
+            </div>
+
+            <div class="brand-text">
+
+                <strong>
+                    On-Call
+                </strong>
+
+                <small>
+                    CONTROL ROOM
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- TITLE -->
+
         <h1>
-            Orange On-Call
+            Welcome
         </h1>
 
         <p>
-            Select dashboard
+            Select your dashboard to continue
         </p>
 
 
-        <a class="employee"
+        <!-- EMPLOYEE DASHBOARD -->
+
+        <a class="dashboard-btn employee"
            href="/employee/employee.html">
 
-            Employee Dashboard
+            Employee Dashboard →
 
         </a>
 
 
-        <a class="manager"
+        <!-- MANAGER DASHBOARD -->
+
+        <a class="dashboard-btn manager"
            href="/manager/manager.html">
 
-            Manager Dashboard
+            Manager Dashboard →
 
         </a>
+
+
+        <!-- ADMIN DASHBOARD -->
+
+        <a class="dashboard-btn admin"
+           href="/admin/admin.html">
+
+            Admin Dashboard →
+
+        </a>
+
+
+        <!-- FOOTER -->
+
+        <div class="footer">
+
+            Orange On-Call Control Room
+
+        </div>
 
 
     </div>
-
 
 </body>
 
