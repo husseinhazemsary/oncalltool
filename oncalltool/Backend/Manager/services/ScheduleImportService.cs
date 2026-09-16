@@ -856,7 +856,7 @@ public class ScheduleImportService
     private static string? NullIfEmpty(
         string value)
     {
-        return string.IsNullOrWhiteSpace(
+        return string.IsNullOrWhiteSpace(   
             value)
             ? null
             : value.Trim();

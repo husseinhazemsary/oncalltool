@@ -1088,8 +1088,7 @@ function populateEmployeeSelects() {
     const availableEmployees =
         teamMembers.filter(
             employee =>
-                employee.role !== "Manager"
-        );
+                employee.role === "Employee"        );
 
 
     availableEmployees.forEach(
@@ -1146,8 +1145,7 @@ function openCreateScheduleModal() {
     const availableEmployees =
         teamMembers.filter(
             employee =>
-                employee.role !== "Manager"
-        );
+                employee.role === "Employee"        );
 
 
     if (availableEmployees.length < 2) {
@@ -2542,7 +2540,6 @@ document
         "click",
         exportSchedules
     );
-
 
 document
     .querySelector("#exportIncidentsBtn")

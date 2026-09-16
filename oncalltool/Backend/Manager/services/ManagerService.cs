@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using oncalltool.Backend.Common.Data;
 using oncalltool.Backend.Common.Models;
 using oncalltool.Backend.Manager.DTOs;
@@ -9,37 +10,30 @@ public class ManagerService
 {
     private readonly AppDbContext _db;
 
-
-    public ManagerService(
-        AppDbContext db)
+    public ManagerService(AppDbContext db)
     {
         _db = db;
     }
 
-
     // =========================================================
     // GET MANAGER
     //
-    // Used for actions that ONLY the actual Manager can do.
-    // Example: granting/removing schedule privilege.
+    // Only an actual Manager can grant/remove privileges.
     // =========================================================
 
     private async Task<AppUser> GetManagerAsync(
         string employeeId)
     {
-        var user =
-            await _db.Users
-                .Include(x => x.Department)
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeId == employeeId);
-
+        var user = await _db.Users
+            .Include(x => x.Department)
+            .FirstOrDefaultAsync(x =>
+                x.EmployeeId == employeeId);
 
         if (user == null)
         {
             throw new KeyNotFoundException(
                 "User was not found.");
         }
-
 
         if (user.Role != "Manager")
         {
@@ -47,28 +41,26 @@ public class ManagerService
                 "Only the team manager can perform this action.");
         }
 
-
         return user;
     }
-
 
     // =========================================================
     // GET SCHEDULE EDITOR
     //
     // Allowed:
     // 1. Manager
-    // 2. Employee with SchedulePrivilege = true
+    // 2. Employee with SchedulePrivilege
+    //
+    // Admin is NOT allowed through SchedulePrivilege.
     // =========================================================
 
     private async Task<AppUser> GetScheduleEditorAsync(
         string employeeId)
     {
-        var user =
-            await _db.Users
-                .Include(x => x.Department)
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeId == employeeId);
-
+        var user = await _db.Users
+            .Include(x => x.Department)
+            .FirstOrDefaultAsync(x =>
+                x.EmployeeId == employeeId);
 
         if (user == null)
         {
@@ -76,12 +68,14 @@ public class ManagerService
                 "User was not found.");
         }
 
-
         var canEdit =
             user.Role == "Manager"
             ||
-            user.SchedulePrivilege;
-
+            (
+                user.Role == "Employee"
+                &&
+                user.SchedulePrivilege
+            );
 
         if (!canEdit)
         {
@@ -89,106 +83,84 @@ public class ManagerService
                 "You do not have permission to manage on-call schedules.");
         }
 
-
         return user;
     }
 
-
     // =========================================================
     // DASHBOARD
+    //
+    // Admin is excluded from the team-member count.
     // =========================================================
 
-    public async Task<ManagerDashboardDto>
-        GetDashboardAsync(
-            string managerEmployeeId)
+    public async Task<ManagerDashboardDto> GetDashboardAsync(
+        string managerEmployeeId)
     {
-        var editor =
-            await GetScheduleEditorAsync(
-                managerEmployeeId);
+        var editor = await GetScheduleEditorAsync(
+            managerEmployeeId);
 
+        // Count Manager + Employees, but NOT Admin.
+        var teamMemberCount = await _db.Users
+            .CountAsync(x =>
+                x.DepartmentId == editor.DepartmentId
+                &&
+                x.Role != "Admin");
 
-        var teamMemberCount =
-            await _db.Users
-                .CountAsync(x =>
-                    x.DepartmentId ==
-                    editor.DepartmentId);
+        // Count only regular employees with scheduling privilege.
+        var scheduleEditors = await _db.Users
+            .CountAsync(x =>
+                x.DepartmentId == editor.DepartmentId
+                &&
+                x.Role == "Employee"
+                &&
+                x.SchedulePrivilege);
 
+        var today = DateTime.Today;
 
-        var scheduleEditors =
-            await _db.Users
-                .CountAsync(x =>
-                    x.DepartmentId ==
-                        editor.DepartmentId
-                    &&
-                    x.Role != "Manager"
-                    &&
-                    x.SchedulePrivilege);
-
-
-        var today =
-            DateTime.Today;
-
-
-        var todaySchedule =
-            await _db.OnCallSchedules
-
-                .Include(x =>
-                    x.PrimaryEmployee)
-
-                .Include(x =>
-                    x.SecondaryEmployee)
-
-                .FirstOrDefaultAsync(x =>
-                    x.DepartmentId ==
-                        editor.DepartmentId
-                    &&
-                    x.Date.Date ==
-                        today.Date);
-
+        var todaySchedule = await _db.OnCallSchedules
+            .Include(x => x.PrimaryEmployee)
+            .Include(x => x.SecondaryEmployee)
+            .FirstOrDefaultAsync(x =>
+                x.DepartmentId == editor.DepartmentId
+                &&
+                x.Date.Date == today.Date);
 
         return new ManagerDashboardDto
         {
             DepartmentName =
-                editor.Department?.Name
-                ?? "",
+                editor.Department?.Name ?? "",
 
             TeamMemberCount =
                 teamMemberCount,
 
             PrimaryToday =
-                todaySchedule?
-                    .PrimaryEmployee?
-                    .Name,
+                todaySchedule?.PrimaryEmployee?.Name,
 
             SecondaryToday =
-                todaySchedule?
-                    .SecondaryEmployee?
-                    .Name,
+                todaySchedule?.SecondaryEmployee?.Name,
 
             ScheduleEditors =
                 scheduleEditors
         };
     }
 
-
     // =========================================================
     // GET MY TEAM
+    //
+    // Only members of the Manager's department.
+    // Admin is excluded.
     // =========================================================
 
-    public async Task<List<TeamMemberDto>>
-        GetTeamAsync(
-            string managerEmployeeId)
+    public async Task<List<TeamMemberDto>> GetTeamAsync(
+        string managerEmployeeId)
     {
-        var editor =
-            await GetScheduleEditorAsync(
-                managerEmployeeId);
-
+        var editor = await GetScheduleEditorAsync(
+            managerEmployeeId);
 
         return await _db.Users
-
             .Where(x =>
-                x.DepartmentId ==
-                editor.DepartmentId)
+                x.DepartmentId == editor.DepartmentId
+                &&
+                x.Role != "Admin")
 
             .OrderByDescending(x =>
                 x.Role == "Manager")
@@ -196,135 +168,111 @@ public class ManagerService
             .ThenBy(x =>
                 x.Name)
 
-            .Select(x =>
-                new TeamMemberDto
-                {
-                    Id =
-                        x.Id,
+            .Select(x => new TeamMemberDto
+            {
+                Id = x.Id,
 
-                    EmployeeId =
-                        x.EmployeeId ?? "",
+                EmployeeId = x.EmployeeId ?? "",
 
-                    Name =
-                        x.Name,
+                Name = x.Name,
 
-                    Phone =
-                        x.Phone ?? "",
+                Phone = x.Phone ?? "",
 
-                    Email =
-                        x.Email ?? "",
+                Email = x.Email ?? "",
 
-                    Role =
-                        x.Role,
+                Role = x.Role,
 
-                    SchedulePrivilege =
-                        x.SchedulePrivilege
-                })
+                SchedulePrivilege = x.SchedulePrivilege
+            })
 
             .ToListAsync();
     }
-
 
     // =========================================================
     // GET ON-CALL SCHEDULES
     //
-    // Includes:
-    // - Primary / Secondary
-    // - Day Type
-    // - Primary Status
-    // - Swap Note
-    // - Incident information
+    // Includes all metadata required for:
+    // - Schedule table
+    // - Export Schedule
+    // - Incident History
+    // - Swap History
     // =========================================================
 
-    public async Task<List<OnCallDto>>
-        GetOnCallsAsync(
-            string managerEmployeeId)
+    public async Task<List<OnCallDto>> GetOnCallsAsync(
+        string managerEmployeeId)
     {
-        var editor =
-            await GetScheduleEditorAsync(
-                managerEmployeeId);
-
+        var editor = await GetScheduleEditorAsync(
+            managerEmployeeId);
 
         return await _db.OnCallSchedules
-
             .Where(x =>
-                x.DepartmentId ==
-                editor.DepartmentId)
+                x.DepartmentId == editor.DepartmentId)
 
-            .Include(x =>
-                x.PrimaryEmployee)
+            .Include(x => x.PrimaryEmployee)
+            .Include(x => x.SecondaryEmployee)
 
-            .Include(x =>
-                x.SecondaryEmployee)
+            .OrderBy(x => x.Date)
 
-            .OrderBy(x =>
-                x.Date)
+            .Select(x => new OnCallDto
+            {
+                Id = x.Id,
 
-            .Select(x =>
-                new OnCallDto
-                {
-                    Id =
-                        x.Id,
+                Date = x.Date,
 
-                    Date =
-                        x.Date,
+                DayType = x.DayType,
 
-                    DayType =
-                        x.DayType,
+                PrimaryEmployeeId =
+                    x.PrimaryEmployeeId,
 
+                PrimaryName =
+                    x.PrimaryEmployee != null
+                        ? x.PrimaryEmployee.Name
+                        : "Unassigned",
 
-                    PrimaryEmployeeId =
-                        x.PrimaryEmployeeId,
+                PrimaryStatus =
+                    x.PrimaryStatus,
 
-                    PrimaryName =
-                        x.PrimaryEmployee != null
-                            ? x.PrimaryEmployee.Name
-                            : "Unassigned",
+                SecondaryEmployeeId =
+                    x.SecondaryEmployeeId,
 
-                    PrimaryStatus =
-                        x.PrimaryStatus,
+                SecondaryName =
+                    x.SecondaryEmployee != null
+                        ? x.SecondaryEmployee.Name
+                        : "Unassigned",
 
+                SwapNote =
+                    x.SwapNote,
 
-                    SecondaryEmployeeId =
-                        x.SecondaryEmployeeId,
+                IncidentCount =
+                    x.IncidentCount,
 
-                    SecondaryName =
-                        x.SecondaryEmployee != null
-                            ? x.SecondaryEmployee.Name
-                            : "Unassigned",
+                ImpactedPlatforms =
+                    x.ImpactedPlatforms,
 
-
-                    SwapNote =
-                        x.SwapNote,
-
-
-                    IncidentCount =
-                        x.IncidentCount,
-
-                    ImpactedPlatforms =
-                        x.ImpactedPlatforms,
-
-                    IncidentDescription =
-                        x.IncidentDescription
-                })
+                IncidentDescription =
+                    x.IncidentDescription
+            })
 
             .ToListAsync();
     }
 
-
     // =========================================================
     // CREATE ON-CALL
+    //
+    // Primary and Secondary must:
+    // - Belong to the same department
+    // - Have Role == Employee
+    // - Be different employees
+    //
+    // Managers and Admins cannot be assigned.
     // =========================================================
 
-    public async Task<OnCallDto>
-        CreateOnCallAsync(
-            string managerEmployeeId,
-            CreateOnCallDto dto)
+    public async Task<OnCallDto> CreateOnCallAsync(
+        string managerEmployeeId,
+        CreateOnCallDto dto)
     {
-        var editor =
-            await GetScheduleEditorAsync(
-                managerEmployeeId);
-
+        var editor = await GetScheduleEditorAsync(
+            managerEmployeeId);
 
         // -----------------------------------------------------
         // BASIC VALIDATION
@@ -336,13 +284,11 @@ public class ManagerService
                 "Schedule date is required.");
         }
 
-
         if (dto.PrimaryEmployeeId <= 0)
         {
             throw new ArgumentException(
                 "Primary employee is required.");
         }
-
 
         if (dto.SecondaryEmployeeId <= 0)
         {
@@ -350,75 +296,47 @@ public class ManagerService
                 "Secondary employee is required.");
         }
 
-
-        if (
-            dto.PrimaryEmployeeId ==
-            dto.SecondaryEmployeeId
-        )
+        if (dto.PrimaryEmployeeId == dto.SecondaryEmployeeId)
         {
             throw new ArgumentException(
                 "Primary and Secondary employees must be different.");
         }
 
-
         // -----------------------------------------------------
         // VALIDATE EMPLOYEES
-        //
-        // They must:
-        // - belong to this department
-        // - NOT be Managers
         // -----------------------------------------------------
 
-        var employees =
-            await _db.Users
+        var employees = await _db.Users
+            .Where(x =>
+                x.DepartmentId == editor.DepartmentId
+                &&
+                x.Role == "Employee"
+                &&
+                (
+                    x.Id == dto.PrimaryEmployeeId
+                    ||
+                    x.Id == dto.SecondaryEmployeeId
+                ))
 
-                .Where(x =>
-                    x.DepartmentId ==
-                        editor.DepartmentId
-
-                    &&
-
-                    x.Role != "Manager"
-
-                    &&
-
-                    (
-                        x.Id ==
-                            dto.PrimaryEmployeeId
-
-                        ||
-
-                        x.Id ==
-                            dto.SecondaryEmployeeId
-                    ))
-
-                .ToListAsync();
-
+            .ToListAsync();
 
         if (employees.Count != 2)
         {
             throw new ArgumentException(
-                "Primary and Secondary must be employees from your department. Managers cannot be assigned to on-call.");
+                "Primary and Secondary must be regular employees from your department. Managers and Admins cannot be assigned to on-call.");
         }
 
-
-        var date =
-            dto.Date.Date;
-
+        var date = dto.Date.Date;
 
         // -----------------------------------------------------
-        // DUPLICATE DATE CHECK
+        // PREVENT DUPLICATE DATES
         // -----------------------------------------------------
 
-        var exists =
-            await _db.OnCallSchedules
-                .AnyAsync(x =>
-                    x.DepartmentId ==
-                        editor.DepartmentId
-                    &&
-                    x.Date.Date ==
-                        date);
-
+        var exists = await _db.OnCallSchedules
+            .AnyAsync(x =>
+                x.DepartmentId == editor.DepartmentId
+                &&
+                x.Date.Date == date);
 
         if (exists)
         {
@@ -426,71 +344,58 @@ public class ManagerService
                 "An on-call schedule already exists for this date.");
         }
 
-
         // -----------------------------------------------------
         // CREATE
         // -----------------------------------------------------
 
-        var schedule =
-            new OnCallSchedule
-            {
-                DepartmentId =
-                    editor.DepartmentId,
+        var schedule = new OnCallSchedule
+        {
+            DepartmentId =
+                editor.DepartmentId,
 
-                Date =
-                    date,
+            Date =
+                date,
 
-                PrimaryEmployeeId =
-                    dto.PrimaryEmployeeId,
+            PrimaryEmployeeId =
+                dto.PrimaryEmployeeId,
 
-                SecondaryEmployeeId =
-                    dto.SecondaryEmployeeId
-            };
+            SecondaryEmployeeId =
+                dto.SecondaryEmployeeId
+        };
 
-
-        _db.OnCallSchedules.Add(
-            schedule);
-
+        _db.OnCallSchedules.Add(schedule);
 
         await _db.SaveChangesAsync();
 
-
-        return await GetOnCallByIdAsync(
-            schedule.Id);
+        return await GetOnCallByIdAsync(schedule.Id);
     }
-
 
     // =========================================================
     // UPDATE ON-CALL
+    //
+    // Only regular employees from this department
+    // can be Primary or Secondary.
     // =========================================================
 
-    public async Task<OnCallDto>
-        UpdateOnCallAsync(
-            string managerEmployeeId,
-            int scheduleId,
-            CreateOnCallDto dto)
+    public async Task<OnCallDto> UpdateOnCallAsync(
+        string managerEmployeeId,
+        int scheduleId,
+        CreateOnCallDto dto)
     {
-        var editor =
-            await GetScheduleEditorAsync(
-                managerEmployeeId);
+        var editor = await GetScheduleEditorAsync(
+            managerEmployeeId);
 
-
-        var schedule =
-            await _db.OnCallSchedules
-                .FirstOrDefaultAsync(x =>
-                    x.Id ==
-                        scheduleId
-                    &&
-                    x.DepartmentId ==
-                        editor.DepartmentId);
-
+        var schedule = await _db.OnCallSchedules
+            .FirstOrDefaultAsync(x =>
+                x.Id == scheduleId
+                &&
+                x.DepartmentId == editor.DepartmentId);
 
         if (schedule == null)
         {
             throw new KeyNotFoundException(
                 "On-call schedule was not found.");
         }
-
 
         // -----------------------------------------------------
         // BASIC VALIDATION
@@ -502,13 +407,11 @@ public class ManagerService
                 "Schedule date is required.");
         }
 
-
         if (dto.PrimaryEmployeeId <= 0)
         {
             throw new ArgumentException(
                 "Primary employee is required.");
         }
-
 
         if (dto.SecondaryEmployeeId <= 0)
         {
@@ -516,80 +419,53 @@ public class ManagerService
                 "Secondary employee is required.");
         }
 
-
-        if (
-            dto.PrimaryEmployeeId ==
-            dto.SecondaryEmployeeId
-        )
+        if (dto.PrimaryEmployeeId == dto.SecondaryEmployeeId)
         {
             throw new ArgumentException(
                 "Primary and Secondary employees must be different.");
         }
 
-
         // -----------------------------------------------------
         // VALIDATE EMPLOYEES
-        //
-        // Managers cannot be placed on-call.
         // -----------------------------------------------------
 
-        var validEmployeeCount =
-            await _db.Users
-                .CountAsync(x =>
-                    x.DepartmentId ==
-                        editor.DepartmentId
-
-                    &&
-
-                    x.Role != "Manager"
-
-                    &&
-
-                    (
-                        x.Id ==
-                            dto.PrimaryEmployeeId
-
-                        ||
-
-                        x.Id ==
-                            dto.SecondaryEmployeeId
-                    ));
-
+        var validEmployeeCount = await _db.Users
+            .CountAsync(x =>
+                x.DepartmentId == editor.DepartmentId
+                &&
+                x.Role == "Employee"
+                &&
+                (
+                    x.Id == dto.PrimaryEmployeeId
+                    ||
+                    x.Id == dto.SecondaryEmployeeId
+                ));
 
         if (validEmployeeCount != 2)
         {
             throw new ArgumentException(
-                "Primary and Secondary must be employees from your department. Managers cannot be assigned to on-call.");
+                "Primary and Secondary must be regular employees from your department. Managers and Admins cannot be assigned to on-call.");
         }
 
-
-        var newDate =
-            dto.Date.Date;
-
+        var newDate = dto.Date.Date;
 
         // -----------------------------------------------------
-        // DUPLICATE DATE CHECK
+        // PREVENT DUPLICATE DATES
         // -----------------------------------------------------
 
-        var duplicateDate =
-            await _db.OnCallSchedules
-                .AnyAsync(x =>
-                    x.DepartmentId ==
-                        editor.DepartmentId
-                    &&
-                    x.Date.Date ==
-                        newDate
-                    &&
-                    x.Id !=
-                        scheduleId);
-
+        var duplicateDate = await _db.OnCallSchedules
+            .AnyAsync(x =>
+                x.DepartmentId == editor.DepartmentId
+                &&
+                x.Date.Date == newDate
+                &&
+                x.Id != scheduleId);
 
         if (duplicateDate)
         {
             throw new ArgumentException(
                 "Another on-call schedule already exists for this date.");
         }
-
 
         // -----------------------------------------------------
         // UPDATE
@@ -598,45 +474,35 @@ public class ManagerService
         schedule.Date =
             newDate;
 
-
         schedule.PrimaryEmployeeId =
             dto.PrimaryEmployeeId;
-
 
         schedule.SecondaryEmployeeId =
             dto.SecondaryEmployeeId;
 
-
         await _db.SaveChangesAsync();
 
-
-        return await GetOnCallByIdAsync(
-            schedule.Id);
+        return await GetOnCallByIdAsync(schedule.Id);
     }
-
 
     // =========================================================
     // DELETE ON-CALL
+    //
+    // Only schedules from the current department.
     // =========================================================
 
     public async Task DeleteOnCallAsync(
         string managerEmployeeId,
         int scheduleId)
     {
-        var editor =
-            await GetScheduleEditorAsync(
-                managerEmployeeId);
+        var editor = await GetScheduleEditorAsync(
+            managerEmployeeId);
 
-
-        var schedule =
-            await _db.OnCallSchedules
-                .FirstOrDefaultAsync(x =>
-                    x.Id ==
-                        scheduleId
-                    &&
-                    x.DepartmentId ==
-                        editor.DepartmentId);
-
+        var schedule = await _db.OnCallSchedules
+            .FirstOrDefaultAsync(x =>
+                x.Id == scheduleId
+                &&
+                x.DepartmentId == editor.DepartmentId);
 
         if (schedule == null)
         {
@@ -644,19 +510,16 @@ public class ManagerService
                 "On-call schedule was not found.");
         }
 
-
-        _db.OnCallSchedules.Remove(
-            schedule);
-
+        _db.OnCallSchedules.Remove(schedule);
 
         await _db.SaveChangesAsync();
     }
 
-
     // =========================================================
     // UPDATE SCHEDULE PRIVILEGE
     //
-    // ONLY an actual Manager can grant/remove this permission.
+    // Only Manager can grant/remove this permission.
+    // Only regular Employees can receive it.
     // =========================================================
 
     public async Task UpdateSchedulePrivilegeAsync(
@@ -664,20 +527,14 @@ public class ManagerService
         int employeeId,
         bool allowed)
     {
-        var manager =
-            await GetManagerAsync(
-                managerEmployeeId);
+        var manager = await GetManagerAsync(
+            managerEmployeeId);
 
-
-        var employee =
-            await _db.Users
-                .FirstOrDefaultAsync(x =>
-                    x.Id ==
-                        employeeId
-                    &&
-                    x.DepartmentId ==
-                        manager.DepartmentId);
-
+        var employee = await _db.Users
+            .FirstOrDefaultAsync(x =>
+                x.Id == employeeId
+                &&
+                x.DepartmentId == manager.DepartmentId);
 
         if (employee == null)
         {
@@ -685,52 +542,40 @@ public class ManagerService
                 "Employee was not found in your department.");
         }
 
-
-        if (employee.Role == "Manager")
+        // Prevent privilege changes for Manager or Admin.
+        if (employee.Role != "Employee")
         {
             throw new ArgumentException(
-                "Manager privilege cannot be changed here.");
+                "Schedule privilege can only be assigned to regular employees.");
         }
-
 
         employee.SchedulePrivilege =
             allowed;
 
-
         await _db.SaveChangesAsync();
     }
-
 
     // =========================================================
     // GET SINGLE ON-CALL
     //
-    // Used after create/update.
-    // Includes all imported metadata too.
+    // Used after creating/updating a schedule.
+    // Returns all imported metadata.
     // =========================================================
 
-    private async Task<OnCallDto>
-        GetOnCallByIdAsync(
-            int id)
+    private async Task<OnCallDto> GetOnCallByIdAsync(
+        int id)
     {
-        var schedule =
-            await _db.OnCallSchedules
-
-                .Include(x =>
-                    x.PrimaryEmployee)
-
-                .Include(x =>
-                    x.SecondaryEmployee)
-
-                .FirstOrDefaultAsync(x =>
-                    x.Id == id);
-
+        var schedule = await _db.OnCallSchedules
+            .Include(x => x.PrimaryEmployee)
+            .Include(x => x.SecondaryEmployee)
+            .FirstOrDefaultAsync(x =>
+                x.Id == id);
 
         if (schedule == null)
         {
             throw new KeyNotFoundException(
                 "On-call schedule was not found.");
         }
-
 
         return new OnCallDto
         {
@@ -743,7 +588,6 @@ public class ManagerService
             DayType =
                 schedule.DayType,
 
-
             PrimaryEmployeeId =
                 schedule.PrimaryEmployeeId,
 
@@ -755,7 +599,6 @@ public class ManagerService
             PrimaryStatus =
                 schedule.PrimaryStatus,
 
-
             SecondaryEmployeeId =
                 schedule.SecondaryEmployeeId,
 
@@ -764,10 +607,8 @@ public class ManagerService
                     ? schedule.SecondaryEmployee.Name
                     : "Unassigned",
 
-
             SwapNote =
                 schedule.SwapNote,
-
 
             IncidentCount =
                 schedule.IncidentCount,
