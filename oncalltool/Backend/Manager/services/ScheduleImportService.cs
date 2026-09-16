@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿
+using System.Globalization;
 using ClosedXML.Excel;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -13,13 +14,14 @@ public class ScheduleImportService
 {
     private readonly AppDbContext _db;
 
-
-    public ScheduleImportService(
-        AppDbContext db)
+    public ScheduleImportService(AppDbContext db)
     {
         _db = db;
     }
 
+    // =========================================================
+    // IMPORT ROW MODEL
+    // =========================================================
 
     private class ImportRow
     {
@@ -44,20 +46,23 @@ public class ScheduleImportService
         public string IncidentDescription { get; set; } = "";
     }
 
-
     // =========================================================
     // PERMISSION
+    //
+    // Allowed:
+    // 1. Manager
+    // 2. Employee with SchedulePrivilege
+    //
+    // Admin cannot import through SchedulePrivilege.
     // =========================================================
 
     private async Task<AppUser> GetScheduleEditorAsync(
         string employeeId)
     {
-        var user =
-            await _db.Users
-                .Include(x => x.Department)
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeId == employeeId);
-
+        var user = await _db.Users
+            .Include(x => x.Department)
+            .FirstOrDefaultAsync(x =>
+                x.EmployeeId == employeeId);
 
         if (user == null)
         {
@@ -65,24 +70,30 @@ public class ScheduleImportService
                 "User was not found.");
         }
 
+        var canImport =
+            user.Role == "Manager"
+            ||
+            (
+                user.Role == "Employee"
+                &&
+                user.SchedulePrivilege
+            );
 
-        if (
-            user.Role != "Manager"
-            &&
-            !user.SchedulePrivilege
-        )
+        if (!canImport)
         {
             throw new UnauthorizedAccessException(
                 "You do not have permission to import schedules.");
         }
 
-
         return user;
     }
 
-
     // =========================================================
     // MAIN IMPORT
+    //
+    // Supports:
+    // - CSV
+    // - Excel XLSX
     // =========================================================
 
     public async Task<CsvImportResultDto> ImportAsync(
@@ -90,48 +101,33 @@ public class ScheduleImportService
         Stream fileStream,
         string extension)
     {
-        var editor =
-            await GetScheduleEditorAsync(
-                employeeId);
-
+        var editor = await GetScheduleEditorAsync(
+            employeeId);
 
         List<ImportRow> rows;
 
-
-        if (
-            extension.Equals(
-                ".csv",
-                StringComparison.OrdinalIgnoreCase)
-        )
+        if (extension.Equals(
+            ".csv",
+            StringComparison.OrdinalIgnoreCase))
         {
-            rows =
-                ReadCsv(
-                    fileStream);
+            rows = ReadCsv(fileStream);
         }
-
-        else if (
-            extension.Equals(
-                ".xlsx",
-                StringComparison.OrdinalIgnoreCase)
-        )
+        else if (extension.Equals(
+            ".xlsx",
+            StringComparison.OrdinalIgnoreCase))
         {
-            rows =
-                ReadExcel(
-                    fileStream);
+            rows = ReadExcel(fileStream);
         }
-
         else
         {
             throw new ArgumentException(
                 "Only CSV and XLSX files are supported.");
         }
 
-
         return await ImportRowsAsync(
             editor,
             rows);
     }
-
 
     // =========================================================
     // READ CSV
@@ -140,257 +136,184 @@ public class ScheduleImportService
     private static List<ImportRow> ReadCsv(
         Stream stream)
     {
-        var rows =
-            new List<ImportRow>();
+        var rows = new List<ImportRow>();
 
+        using var reader = new StreamReader(stream);
 
-        using var reader =
-            new StreamReader(
-                stream);
+        var config = new CsvConfiguration(
+            CultureInfo.InvariantCulture)
+        {
+            HeaderValidated = null,
 
+            MissingFieldFound = null,
 
-        var config =
-            new CsvConfiguration(
-                CultureInfo.InvariantCulture)
-            {
-                HeaderValidated = null,
+            BadDataFound = null,
 
-                MissingFieldFound = null,
+            TrimOptions = TrimOptions.Trim
+        };
 
-                BadDataFound = null,
-
-                TrimOptions =
-                    TrimOptions.Trim
-            };
-
-
-        using var csv =
-            new CsvReader(
-                reader,
-                config);
-
+        using var csv = new CsvReader(
+            reader,
+            config);
 
         if (!csv.Read())
         {
             return rows;
         }
 
-
         csv.ReadHeader();
 
-
-        var rowNumber =
-            1;
-
+        var rowNumber = 1;
 
         while (csv.Read())
         {
             rowNumber++;
 
+            var dateText = GetCsvField(
+                csv,
+                "Date");
 
-            var dateText =
-                GetCsvField(
-                    csv,
-                    "Date");
-
-
-            if (
-                string.IsNullOrWhiteSpace(
-                    dateText)
-            )
+            if (string.IsNullOrWhiteSpace(dateText))
             {
                 continue;
             }
 
-
-            if (
-                !TryParseDate(
-                    dateText,
-                    out var date)
-            )
+            if (!TryParseDate(dateText, out var date))
             {
                 throw new ArgumentException(
                     $"Row {rowNumber}: Invalid date '{dateText}'.");
             }
 
+            var incidentText = GetCsvField(
+                csv,
+                "Incident Count");
 
-            var incidentText =
-                GetCsvField(
-                    csv,
-                    "Incident Count");
-
-
-            var incidentCount =
-                0;
-
+            var incidentCount = 0;
 
             if (
-                !string.IsNullOrWhiteSpace(
-                    incidentText)
+                !string.IsNullOrWhiteSpace(incidentText)
                 &&
                 !int.TryParse(
                     incidentText,
-                    out incidentCount)
-            )
+                    out incidentCount))
             {
                 throw new ArgumentException(
                     $"Row {rowNumber}: Invalid Incident Count.");
             }
 
+            rows.Add(new ImportRow
+            {
+                RowNumber = rowNumber,
 
-            rows.Add(
-                new ImportRow
-                {
-                    RowNumber =
-                        rowNumber,
+                Date = date.Date,
 
-                    Date =
-                        date.Date,
+                DayType = GetCsvField(
+                    csv,
+                    "Type"),
 
-                    DayType =
-                        GetCsvField(
-                            csv,
-                            "Type"),
+                PrimaryName = GetCsvField(
+                    csv,
+                    "Primary"),
 
-                    PrimaryName =
-                        GetCsvField(
-                            csv,
-                            "Primary"),
+                PrimaryStatus = GetCsvField(
+                    csv,
+                    "Primary Status"),
 
-                    PrimaryStatus =
-                        GetCsvField(
-                            csv,
-                            "Primary Status"),
+                SecondaryName = GetCsvFieldAny(
+                    csv,
+                    "Secondry",
+                    "Secondary"),
 
-                    SecondaryName =
-                        GetCsvFieldAny(
-                            csv,
-                            "Secondry",
-                            "Secondary"),
+                SwapNote = GetCsvField(
+                    csv,
+                    "Swap"),
 
-                    SwapNote =
-                        GetCsvField(
-                            csv,
-                            "Swap"),
+                IncidentCount = incidentCount,
 
-                    IncidentCount =
-                        incidentCount,
+                ImpactedPlatforms = GetCsvField(
+                    csv,
+                    "Impacted Platforms"),
 
-                    ImpactedPlatforms =
-                        GetCsvField(
-                            csv,
-                            "Impacted Platforms"),
-
-                    IncidentDescription =
-                        GetCsvField(
-                            csv,
-                            "Incident Description")
-                });
+                IncidentDescription = GetCsvField(
+                    csv,
+                    "Incident Description")
+            });
         }
-
 
         return rows;
     }
 
-
     // =========================================================
     // READ EXCEL
     //
-    // Supports your original "2026" sheet.
+    // Supports the original "2026" worksheet.
+    //
+    // Columns:
+    // 1. Date
+    // 2. Type
+    // 3. Primary
+    // 4. Primary Status
+    // 5. Secondry / Secondary
+    // 6. Swap
+    // 7. Incident Count
+    // 8. Impacted Platforms
+    // 9. Incident Description
     // =========================================================
 
     private static List<ImportRow> ReadExcel(
         Stream stream)
     {
-        var rows =
-            new List<ImportRow>();
+        var rows = new List<ImportRow>();
 
-
-        using var workbook =
-            new XLWorkbook(
-                stream);
-
+        using var workbook = new XLWorkbook(stream);
 
         IXLWorksheet sheet;
 
-
-        if (
-            workbook.Worksheets
-                .TryGetWorksheet(
-                    "2026",
-                    out var sheet2026)
-        )
+        if (workbook.Worksheets.TryGetWorksheet(
+            "2026",
+            out var sheet2026))
         {
-            sheet =
-                sheet2026;
+            sheet = sheet2026;
         }
-
         else
         {
-            sheet =
-                workbook.Worksheets.First();
+            sheet = workbook.Worksheets.First();
         }
 
-
-        foreach (
-            var row in
-            sheet.RowsUsed().Skip(1)
-        )
+        foreach (var row in sheet.RowsUsed().Skip(1))
         {
-            if (
-                row.Cell(1).IsEmpty()
-            )
+            if (row.Cell(1).IsEmpty())
             {
                 continue;
             }
 
-
             DateTime date;
 
-
-            if (
-                !row.Cell(1)
-                    .TryGetValue<DateTime>(
-                        out date)
-            )
+            if (!row.Cell(1).TryGetValue<DateTime>(
+                out date))
             {
-                var dateText =
-                    row.Cell(1)
-                        .GetString()
-                        .Trim();
+                var dateText = row.Cell(1)
+                    .GetString()
+                    .Trim();
 
-
-                if (
-                    !TryParseDate(
-                        dateText,
-                        out date)
-                )
+                if (!TryParseDate(dateText, out date))
                 {
                     throw new ArgumentException(
                         $"Excel row {row.RowNumber()}: Invalid date.");
                 }
             }
 
+            var incidentCount = 0;
 
-            var incidentCount =
-                0;
-
-
-            var incidentCell =
-                row.Cell(7);
-
+            var incidentCell = row.Cell(7);
 
             if (!incidentCell.IsEmpty())
             {
-                if (
-                    incidentCell.TryGetValue<int>(
-                        out var number)
-                )
+                if (incidentCell.TryGetValue<int>(
+                    out var number))
                 {
-                    incidentCount =
-                        number;
+                    incidentCount = number;
                 }
-
                 else
                 {
                     int.TryParse(
@@ -399,77 +322,68 @@ public class ScheduleImportService
                 }
             }
 
+            rows.Add(new ImportRow
+            {
+                RowNumber = row.RowNumber(),
 
-            rows.Add(
-                new ImportRow
-                {
-                    RowNumber =
-                        row.RowNumber(),
+                Date = date.Date,
 
-                    Date =
-                        date.Date,
+                DayType = row.Cell(2)
+                    .GetString()
+                    .Trim(),
 
-                    DayType =
-                        row.Cell(2)
-                            .GetString()
-                            .Trim(),
+                PrimaryName = row.Cell(3)
+                    .GetString()
+                    .Trim(),
 
-                    PrimaryName =
-                        row.Cell(3)
-                            .GetString()
-                            .Trim(),
+                PrimaryStatus = row.Cell(4)
+                    .GetString()
+                    .Trim(),
 
-                    PrimaryStatus =
-                        row.Cell(4)
-                            .GetString()
-                            .Trim(),
+                SecondaryName = row.Cell(5)
+                    .GetString()
+                    .Trim(),
 
-                    SecondaryName =
-                        row.Cell(5)
-                            .GetString()
-                            .Trim(),
+                SwapNote = row.Cell(6)
+                    .GetString()
+                    .Trim(),
 
-                    SwapNote =
-                        row.Cell(6)
-                            .GetString()
-                            .Trim(),
+                IncidentCount = incidentCount,
 
-                    IncidentCount =
-                        incidentCount,
+                ImpactedPlatforms = row.Cell(8)
+                    .GetString()
+                    .Trim(),
 
-                    ImpactedPlatforms =
-                        row.Cell(8)
-                            .GetString()
-                            .Trim(),
-
-                    IncidentDescription =
-                        row.Cell(9)
-                            .GetString()
-                            .Trim()
-                });
+                IncidentDescription = row.Cell(9)
+                    .GetString()
+                    .Trim()
+            });
         }
-
 
         return rows;
     }
 
-
     // =========================================================
-    // VALIDATE + SAVE
+    // VALIDATE AND SAVE
+    //
+    // Rules:
+    // - Only employees from the editor's department
+    // - Only Role == Employee
+    // - Primary and Secondary must be different
+    // - Duplicate dates in the file are rejected
+    // - Existing schedules are updated
+    // - New schedules are inserted
+    // - No changes saved if validation fails
     // =========================================================
 
-    private async Task<CsvImportResultDto>
-        ImportRowsAsync(
-            AppUser editor,
-            List<ImportRow> rows)
+    private async Task<CsvImportResultDto> ImportRowsAsync(
+        AppUser editor,
+        List<ImportRow> rows)
     {
-        var result =
-            new CsvImportResultDto
-            {
-                TotalRows =
-                    rows.Count
-            };
-
+        var result = new CsvImportResultDto
+        {
+            TotalRows = rows.Count
+        };
 
         if (rows.Count == 0)
         {
@@ -477,64 +391,52 @@ public class ScheduleImportService
                 "The schedule file contains no rows.");
         }
 
+        // =====================================================
+        // IMPORTANT FIX:
+        //
+        // Only regular employees can be assigned on-call.
+        //
+        // Managers and Admins are excluded.
+        // =====================================================
 
-        // Managers must not be assigned on-call.
-        var employees =
-            await _db.Users
+        var employees = await _db.Users
+            .Where(x =>
+                x.DepartmentId == editor.DepartmentId
+                &&
+                x.Role == "Employee")
+            .ToListAsync();
 
-                .Where(x =>
-                    x.DepartmentId ==
-                        editor.DepartmentId
-                    &&
-                    x.Role != "Manager")
+        var employeesByName = employees
+            .GroupBy(
+                x => x.Name.Trim(),
+                StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(
+                x => x.Key,
+                x => x.First(),
+                StringComparer.OrdinalIgnoreCase);
 
-                .ToListAsync();
+        // Load existing schedules for this department.
 
+        var existingSchedules = await _db.OnCallSchedules
+            .Where(x =>
+                x.DepartmentId == editor.DepartmentId)
+            .ToDictionaryAsync(
+                x => x.Date.Date);
 
-        var employeesByName =
-            employees
+        // Prevent repeated dates in the imported file.
 
-                .GroupBy(
-                    x => x.Name.Trim(),
-                    StringComparer.OrdinalIgnoreCase)
+        var fileDates = new HashSet<DateTime>();
 
-                .ToDictionary(
-                    x => x.Key,
-                    x => x.First(),
-                    StringComparer.OrdinalIgnoreCase);
+        var newSchedules = new List<OnCallSchedule>();
 
-
-        var existingSchedules =
-            await _db.OnCallSchedules
-
-                .Where(x =>
-                    x.DepartmentId ==
-                        editor.DepartmentId)
-
-                .ToDictionaryAsync(
-                    x => x.Date.Date);
-
-
-        var fileDates =
-            new HashSet<DateTime>();
-
-
-        var newSchedules =
-            new List<OnCallSchedule>();
-
-
-        foreach (
-            var row in rows
-        )
+        foreach (var row in rows)
         {
-            // ---------------------------------------------
-            // PRIMARY
-            // ---------------------------------------------
+            // -------------------------------------------------
+            // VALIDATE PRIMARY
+            // -------------------------------------------------
 
-            if (
-                string.IsNullOrWhiteSpace(
-                    row.PrimaryName)
-            )
+            if (string.IsNullOrWhiteSpace(
+                row.PrimaryName))
             {
                 result.Errors.Add(
                     $"Row {row.RowNumber}: Primary employee is missing.");
@@ -542,28 +444,22 @@ public class ScheduleImportService
                 continue;
             }
 
-
-            if (
-                !employeesByName.TryGetValue(
-                    row.PrimaryName.Trim(),
-                    out var primary)
-            )
+            if (!employeesByName.TryGetValue(
+                row.PrimaryName.Trim(),
+                out var primary))
             {
                 result.Errors.Add(
-                    $"Row {row.RowNumber}: Primary employee '{row.PrimaryName}' is not in this team.");
+                    $"Row {row.RowNumber}: Primary employee '{row.PrimaryName}' is not an eligible employee in this team.");
 
                 continue;
             }
 
+            // -------------------------------------------------
+            // VALIDATE SECONDARY
+            // -------------------------------------------------
 
-            // ---------------------------------------------
-            // SECONDARY
-            // ---------------------------------------------
-
-            if (
-                string.IsNullOrWhiteSpace(
-                    row.SecondaryName)
-            )
+            if (string.IsNullOrWhiteSpace(
+                row.SecondaryName))
             {
                 result.Errors.Add(
                     $"Row {row.RowNumber}: Secondary employee is missing.");
@@ -571,24 +467,21 @@ public class ScheduleImportService
                 continue;
             }
 
-
-            if (
-                !employeesByName.TryGetValue(
-                    row.SecondaryName.Trim(),
-                    out var secondary)
-            )
+            if (!employeesByName.TryGetValue(
+                row.SecondaryName.Trim(),
+                out var secondary))
             {
                 result.Errors.Add(
-                    $"Row {row.RowNumber}: Secondary employee '{row.SecondaryName}' is not in this team.");
+                    $"Row {row.RowNumber}: Secondary employee '{row.SecondaryName}' is not an eligible employee in this team.");
 
                 continue;
             }
 
+            // -------------------------------------------------
+            // PRIMARY AND SECONDARY MUST BE DIFFERENT
+            // -------------------------------------------------
 
-            if (
-                primary.Id ==
-                secondary.Id
-            )
+            if (primary.Id == secondary.Id)
             {
                 result.Errors.Add(
                     $"Row {row.RowNumber}: Primary and Secondary must be different.");
@@ -596,15 +489,11 @@ public class ScheduleImportService
                 continue;
             }
 
+            // -------------------------------------------------
+            // DUPLICATE DATE INSIDE THE FILE
+            // -------------------------------------------------
 
-            // ---------------------------------------------
-            // DUPLICATE DATE INSIDE FILE
-            // ---------------------------------------------
-
-            if (
-                !fileDates.Add(
-                    row.Date.Date)
-            )
+            if (!fileDates.Add(row.Date.Date))
             {
                 result.Errors.Add(
                     $"Row {row.RowNumber}: Date {row.Date:yyyy-MM-dd} appears more than once.");
@@ -612,16 +501,13 @@ public class ScheduleImportService
                 continue;
             }
 
+            // -------------------------------------------------
+            // UPDATE EXISTING SCHEDULE
+            // -------------------------------------------------
 
-            // ---------------------------------------------
-            // EXISTING OR NEW SCHEDULE
-            // ---------------------------------------------
-
-            if (
-                existingSchedules.TryGetValue(
-                    row.Date.Date,
-                    out var schedule)
-            )
+            if (existingSchedules.TryGetValue(
+                row.Date.Date,
+                out var schedule))
             {
                 ApplyRow(
                     schedule,
@@ -629,19 +515,19 @@ public class ScheduleImportService
                     primary,
                     secondary);
             }
+
+            // -------------------------------------------------
+            // CREATE NEW SCHEDULE
+            // -------------------------------------------------
 
             else
             {
-                schedule =
-                    new OnCallSchedule
-                    {
-                        DepartmentId =
-                            editor.DepartmentId,
+                schedule = new OnCallSchedule
+                {
+                    DepartmentId = editor.DepartmentId,
 
-                        Date =
-                            row.Date.Date
-                    };
-
+                    Date = row.Date.Date
+                };
 
                 ApplyRow(
                     schedule,
@@ -649,88 +535,68 @@ public class ScheduleImportService
                     primary,
                     secondary);
 
+                newSchedules.Add(schedule);
 
-                newSchedules.Add(
-                    schedule);
-
-
-                existingSchedules[
-                    row.Date.Date
-                ] =
-                    schedule;
+                existingSchedules[row.Date.Date] = schedule;
             }
         }
 
+        // =====================================================
+        // ATOMIC VALIDATION
+        //
+        // If any row fails validation, do not save anything.
+        // =====================================================
 
-        // Atomic validation:
-        // one bad row = nothing saved.
-        if (
-            result.Errors.Count > 0
-        )
+        if (result.Errors.Count > 0)
         {
-            result.Success =
-                false;
+            result.Success = false;
 
-            result.ImportedRows =
-                0;
+            result.ImportedRows = 0;
 
-            result.FailedRows =
-                result.Errors.Count;
-
+            result.FailedRows = result.Errors.Count;
 
             return result;
         }
 
+        // =====================================================
+        // DATABASE TRANSACTION
+        // =====================================================
 
         await using var transaction =
-            await _db.Database
-                .BeginTransactionAsync();
-
+            await _db.Database.BeginTransactionAsync();
 
         try
         {
-            if (
-                newSchedules.Count > 0
-            )
+            if (newSchedules.Count > 0)
             {
-                _db.OnCallSchedules
-                    .AddRange(
-                        newSchedules);
+                _db.OnCallSchedules.AddRange(
+                    newSchedules);
             }
-
 
             await _db.SaveChangesAsync();
 
-
-            await transaction
-                .CommitAsync();
+            await transaction.CommitAsync();
         }
-
         catch
         {
-            await transaction
-                .RollbackAsync();
+            await transaction.RollbackAsync();
 
             throw;
         }
 
+        result.Success = true;
 
-        result.Success =
-            true;
+        result.ImportedRows = rows.Count;
 
-        result.ImportedRows =
-            rows.Count;
-
-        result.FailedRows =
-            0;
-
+        result.FailedRows = 0;
 
         return result;
     }
 
-
     // =========================================================
     // APPLY IMPORT ROW
+    //
+    // Copy the imported data into the database schedule.
     // =========================================================
 
     private static void ApplyRow(
@@ -739,39 +605,29 @@ public class ScheduleImportService
         AppUser primary,
         AppUser secondary)
     {
-        schedule.PrimaryEmployeeId =
-            primary.Id;
+        schedule.PrimaryEmployeeId = primary.Id;
 
-        schedule.SecondaryEmployeeId =
-            secondary.Id;
+        schedule.SecondaryEmployeeId = secondary.Id;
 
-        schedule.DayType =
-            NullIfEmpty(
-                row.DayType);
+        schedule.DayType = NullIfEmpty(
+            row.DayType);
 
-        schedule.PrimaryStatus =
-            NullIfEmpty(
-                row.PrimaryStatus);
+        schedule.PrimaryStatus = NullIfEmpty(
+            row.PrimaryStatus);
 
-        schedule.SwapNote =
-            NullIfEmpty(
-                row.SwapNote);
+        schedule.SwapNote = NullIfEmpty(
+            row.SwapNote);
 
-        schedule.IncidentCount =
-            row.IncidentCount;
+        schedule.IncidentCount = row.IncidentCount;
 
-        schedule.ImpactedPlatforms =
-            NullIfEmpty(
-                row.ImpactedPlatforms);
+        schedule.ImpactedPlatforms = NullIfEmpty(
+            row.ImpactedPlatforms);
 
-        schedule.IncidentDescription =
-            NullIfEmpty(
-                row.IncidentDescription);
+        schedule.IncidentDescription = NullIfEmpty(
+            row.IncidentDescription);
 
-        schedule.SourceSheet =
-            "Manager Import";
+        schedule.SourceSheet = "Manager Import";
     }
-
 
     // =========================================================
     // CSV HELPERS
@@ -783,47 +639,32 @@ public class ScheduleImportService
     {
         try
         {
-            return csv
-                .GetField(
-                    header)
-                ?.Trim()
-                ?? "";
+            return csv.GetField(header)?.Trim() ?? "";
         }
-
         catch
         {
             return "";
         }
     }
 
-
     private static string GetCsvFieldAny(
         CsvReader csv,
         params string[] headers)
     {
-        foreach (
-            var header in headers
-        )
+        foreach (var header in headers)
         {
-            var value =
-                GetCsvField(
-                    csv,
-                    header);
+            var value = GetCsvField(
+                csv,
+                header);
 
-
-            if (
-                !string.IsNullOrWhiteSpace(
-                    value)
-            )
+            if (!string.IsNullOrWhiteSpace(value))
             {
                 return value;
             }
         }
 
-
         return "";
     }
-
 
     // =========================================================
     // DATE HELPER
@@ -833,16 +674,14 @@ public class ScheduleImportService
         string value,
         out DateTime date)
     {
-        var formats =
-            new[]
-            {
-                "yyyy-MM-dd",
-                "M/d/yyyy",
-                "MM/dd/yyyy",
-                "d/M/yyyy",
-                "dd/MM/yyyy"
-            };
-
+        var formats = new[]
+        {
+            "yyyy-MM-dd",
+            "M/d/yyyy",
+            "MM/dd/yyyy",
+            "d/M/yyyy",
+            "dd/MM/yyyy"
+        };
 
         return DateTime.TryParseExact(
             value.Trim(),
@@ -852,12 +691,14 @@ public class ScheduleImportService
             out date);
     }
 
+    // =========================================================
+    // NULL HELPER
+    // =========================================================
 
     private static string? NullIfEmpty(
         string value)
     {
-        return string.IsNullOrWhiteSpace(   
-            value)
+        return string.IsNullOrWhiteSpace(value)
             ? null
             : value.Trim();
     }
