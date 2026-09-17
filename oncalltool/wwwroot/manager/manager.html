@@ -19,7 +19,7 @@
 
 
     <link rel="stylesheet"
-          href="manager.css?v=20260916-1">
+          href="manager.css?v=20260917-30">
 
 </head>
 
@@ -348,14 +348,14 @@
                                 ›
                             </span>
 
-                            <b id="departmentBreadcrumb">
+                            <b id="teamBreadcrumb">
                                 Loading...
                             </b>
 
                         </div>
 
 
-                        <h1 id="departmentTitle">
+                        <h1 id="teamTitle">
                             Loading...
                         </h1>
 
@@ -403,51 +403,62 @@
 
                             Import Schedule
 
-                            <button type="button"
-                                    class="btn-secondary"
-                                    id="exportScheduleBtn">
+                        </button>
 
-                                <svg viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="2"
-                                     stroke-linecap="round"
-                                     stroke-linejoin="round">
+                        <button type="button"
+                                class="btn-secondary"
+                                id="exportScheduleBtn">
 
-                                    <path d="M12 4v12"></path>
-                                    <path d="M7 11l5 5 5-5"></path>
-                                    <path d="M5 17v3h14v-3"></path>
+                            <svg viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
 
-                                </svg>
+                                <path d="M12 4v12"></path>
+                                <path d="M7 11l5 5 5-5"></path>
+                                <path d="M5 17v3h14v-3"></path>
 
-                                Export Schedule
+                            </svg>
 
-                            </button>
+                            Export Schedule
 
-
-
-                            <!-- CREATE ON-CALL -->
-
-                            <button type="button"
-                                    class="btn-primary"
-                                    id="createScheduleBtn">
-
-                                <svg viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="2.4">
-
-                                    <path d="M12 5v14M5 12h14">
-                                    </path>
-
-                                </svg>
-
-                                Create on-call
-
-                            </button>
+                        </button>
 
 
-</div>
+
+                        <!-- Previous calendar month, Excel calculation report -->
+                        <button type="button"
+                                class="btn-secondary"
+                                id="exportLastMonthBtn"
+                                title="Export the full previous calendar month, 1st through last day">
+                            Export Last Month (Excel)
+                        </button>
+
+
+                        <!-- CREATE ON-CALL -->
+
+                        <button type="button"
+                                class="btn-primary"
+                                id="createScheduleBtn">
+
+                            <svg viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2.4">
+
+                                <path d="M12 5v14M5 12h14">
+                                </path>
+
+                            </svg>
+
+                            Create on-call
+
+                        </button>
+
+
+                    </div>
 
 
                 </div>
@@ -475,7 +486,7 @@
                         </div>
 
                         <div class="stat-context"
-                             id="departmentContext">
+                             id="teamContext">
                             Loading...
                         </div>
 
@@ -651,7 +662,7 @@
 
 
 
-                    <div class="table-scroll">
+                    <div class="table-scroll" tabindex="0">
 
 
                         <table>
@@ -681,7 +692,7 @@
                             </thead>
 
 
-                            <tbody id="myDepartmentBody">
+                            <tbody id="myTeamBody">
                             </tbody>
 
 
@@ -726,7 +737,7 @@
                         </div>
 
 
-                        <h1 id="teamTitle">
+                        <h1>
                             My Team
                         </h1>
 
@@ -765,7 +776,7 @@
 
 
 
-                    <div class="table-scroll">
+                    <div class="table-scroll" tabindex="0">
 
 
                         <table>
@@ -896,7 +907,7 @@
 
 
 
-                    <div class="table-scroll">
+                    <div class="table-scroll" tabindex="0">
 
 
                         <table>
@@ -1015,7 +1026,21 @@
 
 
 
-                    <div class="table-scroll">
+                    <div class="swap-toolbar">
+                        <div class="swap-search-wrap">
+                            <input type="search" id="swapHistorySearch"
+                                   placeholder="Search date, primary, partner or swap note..."
+                                   aria-label="Search swap history" autocomplete="off">
+                            <button id="clearSwapSearchBtn" class="swap-search-clear"
+                                    type="button" aria-label="Clear swap search" hidden>
+                                ×
+                            </button>
+                        </div>
+                        <span id="swapHistoryCount" class="swap-result-count" role="status"></span>
+                    </div>
+
+
+                    <div class="table-scroll" tabindex="0">
 
 
                         <table>
@@ -1030,11 +1055,11 @@
                                     </th>
 
                                     <th>
-                                        Primary
+                                        Primary (current)
                                     </th>
 
                                     <th>
-                                        Secondary
+                                        Swapped with
                                     </th>
 
                                     <th>
@@ -1094,7 +1119,7 @@
 
 
             <div class="modal-badge"
-                 id="modalDepartment">
+                 id="modalTeam">
 
                 TEAM
 
@@ -1132,6 +1157,15 @@
                    id="scheduleDate"
                    class="form-control">
 
+
+
+            <!-- Day classification drives the hours calculation. -->
+            <label class="field-label" for="scheduleDayType">Day type</label>
+            <select id="scheduleDayType" class="form-control" required>
+                <option value="">Choose Holiday or Weekday</option>
+                <option value="Weekday">Weekday — 16 hours</option>
+                <option value="Holiday">Holiday — 24 hours</option>
+            </select>
 
 
             <!-- PRIMARY -->
@@ -1208,8 +1242,7 @@
          JAVASCRIPT
          ================================================== -->
 
-    <script src="manager.js?v=20260916-1"></script>
-
+    <script src="manager.js?v=20260917-30"></script>
 
 </body>
 

@@ -60,7 +60,7 @@ public class ScheduleImportService
         string employeeId)
     {
         var user = await _db.Users
-            .Include(x => x.Department)
+            .Include(x => x.Team)
             .FirstOrDefaultAsync(x =>
                 x.EmployeeId == employeeId);
 
@@ -367,7 +367,7 @@ public class ScheduleImportService
     // VALIDATE AND SAVE
     //
     // Rules:
-    // - Only employees from the editor's department
+    // - Only employees from the editor's Team
     // - Only Role == Employee
     // - Primary and Secondary must be different
     // - Duplicate dates in the file are rejected
@@ -401,7 +401,7 @@ public class ScheduleImportService
 
         var employees = await _db.Users
             .Where(x =>
-                x.DepartmentId == editor.DepartmentId
+                x.TeamId == editor.TeamId
                 &&
                 x.Role == "Employee")
             .ToListAsync();
@@ -415,11 +415,11 @@ public class ScheduleImportService
                 x => x.First(),
                 StringComparer.OrdinalIgnoreCase);
 
-        // Load existing schedules for this department.
+        // Load existing schedules for this Team.
 
         var existingSchedules = await _db.OnCallSchedules
             .Where(x =>
-                x.DepartmentId == editor.DepartmentId)
+                x.TeamId == editor.TeamId)
             .ToDictionaryAsync(
                 x => x.Date.Date);
 
@@ -524,7 +524,7 @@ public class ScheduleImportService
             {
                 schedule = new OnCallSchedule
                 {
-                    DepartmentId = editor.DepartmentId,
+                    TeamId = editor.TeamId,
 
                     Date = row.Date.Date
                 };

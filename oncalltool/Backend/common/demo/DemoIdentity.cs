@@ -2,7 +2,7 @@
 
 public static class DemoIdentity
 {
-    public const string DepartmentName =
+    public const string TeamName =
         "Enterprise RA";
 
 

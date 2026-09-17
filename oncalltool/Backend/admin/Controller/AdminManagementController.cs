@@ -40,7 +40,7 @@ public class AdminManagementController : ControllerBase
         if (!await IsAdmin(adminEmployeeId))
             return Denied();
 
-        var departments = await _db.Departments
+        var Teams = await _db.Teams
             .AsNoTracking()
             .OrderBy(x => x.Name)
             .Select(x => new
@@ -75,28 +75,28 @@ public class AdminManagementController : ControllerBase
                 x.Email,
                 x.Phone,
                 x.Role,
-                x.DepartmentId,
-                DepartmentName = x.Department != null
-                    ? x.Department.Name
+                x.TeamId,
+                TeamName = x.Team != null
+                    ? x.Team.Name
                     : ""
             })
             .ToListAsync();
 
         return Ok(new
         {
-            departments,
+            Teams,
             employees
         });
     }
 
     // =====================================================
-    // CREATE DEPARTMENT / TEAM
+    // CREATE Team / TEAM
     // =====================================================
 
-    [HttpPost("departments")]
-    public async Task<IActionResult> CreateDepartment(
+    [HttpPost("Teams")]
+    public async Task<IActionResult> CreateTeam(
         [FromQuery] string adminEmployeeId,
-        [FromBody] CreateDepartmentRequest request)
+        [FromBody] CreateTeamRequest request)
     {
         if (!await IsAdmin(adminEmployeeId))
             return Denied();
@@ -106,76 +106,76 @@ public class AdminManagementController : ControllerBase
         if (string.IsNullOrWhiteSpace(name))
             return BadRequest(new
             {
-                message = "Department name is required."
+                message = "Team name is required."
             });
 
-        if (await _db.Departments.AnyAsync(x =>
+        if (await _db.Teams.AnyAsync(x =>
                 x.Name == name))
         {
             return BadRequest(new
             {
-                message = "Department already exists."
+                message = "Team already exists."
             });
         }
 
-        var department = new Department
+        var Team = new Team
         {
             Name = name
         };
 
-        _db.Departments.Add(department);
+        _db.Teams.Add(Team);
         await _db.SaveChangesAsync();
 
         return Ok(new
         {
-            department.Id,
-            department.Name
+            Team.Id,
+            Team.Name
         });
     }
 
     // =====================================================
-    // DELETE DEPARTMENT
-    // Never delete departments containing employees/schedules.
+    // DELETE Team
+    // Never delete Teams containing employees/schedules.
     // =====================================================
 
-    [HttpDelete("departments/{id:int}")]
-    public async Task<IActionResult> DeleteDepartment(
+    [HttpDelete("Teams/{id:int}")]
+    public async Task<IActionResult> DeleteTeam(
         int id,
         [FromQuery] string adminEmployeeId)
     {
         if (!await IsAdmin(adminEmployeeId))
             return Denied();
 
-        var department = await _db.Departments
+        var Team = await _db.Teams
             .FindAsync(id);
 
-        if (department == null)
+        if (Team == null)
             return NotFound(new
             {
-                message = "Department not found."
+                message = "Team not found."
             });
 
         var hasUsers = await _db.Users
-            .AnyAsync(x => x.DepartmentId == id);
+            .AnyAsync(x => x.TeamId == id);
 
         var hasSchedules = await _db.OnCallSchedules
-            .AnyAsync(x => x.DepartmentId == id);
+            .AnyAsync(x => x.TeamId == id);
 
         if (hasUsers || hasSchedules)
         {
             return BadRequest(new
             {
                 message =
-                    "Move or remove all users and schedules before deleting this department."
+                    "Move or remove all users and schedules before deleting this Team."
             });
         }
 
-        _db.Departments.Remove(department);
+        _db.Teams.Remove(Team);
         await _db.SaveChangesAsync();
 
         return Ok(new
         {
-            message = "Department deleted."
+            message = "Team deleted."
         });
     }
 
@@ -203,13 +203,13 @@ public class AdminManagementController : ControllerBase
             });
         }
 
-        var department = await _db.Departments
-            .FindAsync(request.DepartmentId);
+        var Team = await _db.Teams
+            .FindAsync(request.TeamId);
 
-        if (department == null)
+        if (Team == null)
             return BadRequest(new
             {
-                message = "Select a valid department."
+                message = "Select a valid Team."
             });
 
         if (await _db.Users.AnyAsync(x =>
@@ -222,12 +222,12 @@ public class AdminManagementController : ControllerBase
         }
 
         if (await _db.Users.AnyAsync(x =>
-                x.DepartmentId == request.DepartmentId &&
+                x.TeamId == request.TeamId &&
                 x.Name == name))
         {
             return BadRequest(new
             {
-                message = "An employee with this name already exists in the department."
+                message = "An employee with this name already exists in the Team."
             });
         }
 
@@ -237,7 +237,7 @@ public class AdminManagementController : ControllerBase
             Name = name,
             Email = request.Email?.Trim(),
             Phone = request.Phone?.Trim(),
-            DepartmentId = request.DepartmentId,
+            TeamId = request.TeamId,
             Role = "Employee",
             SchedulePrivilege = false
         };
@@ -254,10 +254,10 @@ public class AdminManagementController : ControllerBase
     }
 
     // =====================================================
-    // MOVE EMPLOYEE BETWEEN DEPARTMENTS
+    // MOVE EMPLOYEE BETWEEN TeamS
     // =====================================================
 
-    [HttpPut("employees/{id:int}/department")]
+    [HttpPut("employees/{id:int}/Team")]
     public async Task<IActionResult> MoveEmployee(
         int id,
         [FromQuery] string adminEmployeeId,
@@ -280,19 +280,19 @@ public class AdminManagementController : ControllerBase
                 message = "Only regular employees can be moved. Revoke manager access first."
             });
 
-        if (!await _db.Departments.AnyAsync(x =>
-                x.Id == request.DepartmentId))
+        if (!await _db.Teams.AnyAsync(x =>
+                x.Id == request.TeamId))
         {
             return BadRequest(new
             {
-                message = "Destination department not found."
+                message = "Destination Team not found."
             });
         }
 
-        if (employee.DepartmentId == request.DepartmentId)
+        if (employee.TeamId == request.TeamId)
             return Ok(new
             {
-                message = "Employee is already in this department."
+                message = "Employee is already in this Team."
             });
 
         var assigned = await _db.OnCallSchedules.AnyAsync(x =>
@@ -306,19 +306,19 @@ public class AdminManagementController : ControllerBase
             });
 
         if (await _db.Users.AnyAsync(x =>
-                x.DepartmentId == request.DepartmentId &&
+                x.TeamId == request.TeamId &&
                 x.Name == employee.Name &&
                 x.Id != id))
         {
             return BadRequest(new
             {
-                message = "An employee with the same name already exists in the destination department."
+                message = "An employee with the same name already exists in the destination Team."
             });
         }
 
-        employee.DepartmentId = request.DepartmentId;
+        employee.TeamId = request.TeamId;
 
-        // Privileges belong to the original department.
+        // Privileges belong to the original Team.
         employee.SchedulePrivilege = false;
 
         await _db.SaveChangesAsync();
@@ -375,44 +375,44 @@ public class AdminManagementController : ControllerBase
     }
 
     // =====================================================
-    // ASSIGN / CHANGE DEPARTMENT MANAGER
-    // Only an employee from this department may become manager.
-    // One manager per department.
+    // ASSIGN / CHANGE Team MANAGER
+    // Only an employee from this Team may become manager.
+    // One manager per Team.
     // =====================================================
 
-    [HttpPut("departments/{departmentId:int}/manager/{employeeId:int}")]
+    [HttpPut("Teams/{TeamId:int}/manager/{employeeId:int}")]
     public async Task<IActionResult> AssignManager(
-        int departmentId,
+        int TeamId,
         int employeeId,
         [FromQuery] string adminEmployeeId)
     {
         if (!await IsAdmin(adminEmployeeId))
             return Denied();
 
-        var department = await _db.Departments
-            .FindAsync(departmentId);
+        var Team = await _db.Teams
+            .FindAsync(TeamId);
 
-        if (department == null)
+        if (Team == null)
             return NotFound(new
             {
-                message = "Department not found."
+                message = "Team not found."
             });
 
         var employee = await _db.Users
             .FirstOrDefaultAsync(x =>
                 x.Id == employeeId &&
-                x.DepartmentId == departmentId &&
+                x.TeamId == TeamId &&
                 (x.Role == "Employee" || x.Role == "Manager"));
 
         if (employee == null)
             return BadRequest(new
             {
-                message = "Select an employee belonging to this department."
+                message = "Select an employee belonging to this Team."
             });
 
         var currentManagers = await _db.Users
             .Where(x =>
-                x.DepartmentId == departmentId &&
+                x.TeamId == TeamId &&
                 x.Role == "Manager")
             .ToListAsync();
 
@@ -432,7 +432,7 @@ public class AdminManagementController : ControllerBase
 
         return Ok(new
         {
-            message = $"{employee.Name} is now the department manager."
+            message = $"{employee.Name} is now the Team manager."
         });
     }
 
@@ -440,9 +440,9 @@ public class AdminManagementController : ControllerBase
     // REVOKE MANAGER
     // =====================================================
 
-    [HttpDelete("departments/{departmentId:int}/manager/{employeeId:int}")]
+    [HttpDelete("Teams/{TeamId:int}/manager/{employeeId:int}")]
     public async Task<IActionResult> RevokeManager(
-        int departmentId,
+        int TeamId,
         int employeeId,
         [FromQuery] string adminEmployeeId)
     {
@@ -452,13 +452,13 @@ public class AdminManagementController : ControllerBase
         var manager = await _db.Users
             .FirstOrDefaultAsync(x =>
                 x.Id == employeeId &&
-                x.DepartmentId == departmentId &&
+                x.TeamId == TeamId &&
                 x.Role == "Manager");
 
         if (manager == null)
             return NotFound(new
             {
-                message = "Manager not found in this department."
+                message = "Manager not found in this Team."
             });
 
         manager.Role = "Employee";
@@ -477,7 +477,7 @@ public class AdminManagementController : ControllerBase
 // REQUEST MODELS
 // =========================================================
 
-public class CreateDepartmentRequest
+public class CreateTeamRequest
 {
     public string Name { get; set; } = "";
 }
@@ -488,10 +488,10 @@ public class CreateEmployeeRequest
     public string Name { get; set; } = "";
     public string? Email { get; set; }
     public string? Phone { get; set; }
-    public int DepartmentId { get; set; }
+    public int TeamId { get; set; }
 }
 
 public class MoveEmployeeRequest
 {
-    public int DepartmentId { get; set; }
+    public int TeamId { get; set; }
 }

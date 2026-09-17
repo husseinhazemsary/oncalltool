@@ -16,7 +16,7 @@ public class AppUser
 
     public bool SchedulePrivilege { get; set; }
 
-    public int DepartmentId { get; set; }
+    public int TeamId { get; set; }
 
-    public Department? Department { get; set; }
+    public Team? Team { get; set; }
 }

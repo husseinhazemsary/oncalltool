@@ -6,9 +6,9 @@ public class OnCallSchedule
 
     public DateTime Date { get; set; }
 
-    public int DepartmentId { get; set; }
+    public int TeamId { get; set; }
 
-    public Department? Department { get; set; }
+    public Team? Team { get; set; }
 
 
     // Nullable because some Excel rows have "-" / no assignment

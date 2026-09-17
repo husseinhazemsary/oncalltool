@@ -1161,3 +1161,137 @@ tbody tr:hover {
     letter-spacing: -0.7px;
     text-transform: lowercase;
 }
+
+/* =========================================================
+   MANAGER UPGRADE: INDEPENDENT TABLE/LIST SCROLLING
+   ========================================================= */
+.manager-section .section-card .table-scroll {
+    max-height: 340px;
+    overflow-y: auto;
+    overflow-x: auto;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: #a9b1c3 #f3f4f8;
+}
+
+#overviewSection .section-card .table-scroll {
+    max-height: 320px;
+}
+
+#teamSection .section-card .table-scroll {
+    max-height: 340px;
+}
+
+#incidentsSection .section-card .table-scroll {
+    max-height: 340px;
+}
+
+#swapHistorySection .section-card .table-scroll {
+    max-height: 340px;
+}
+
+.manager-section .table-scroll thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: white;
+    box-shadow: 0 1px 0 var(--line);
+}
+
+.manager-section .table-scroll::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+}
+
+.manager-section .table-scroll::-webkit-scrollbar-thumb {
+    background: #a9b1c3;
+    border-radius: 8px;
+    border: 2px solid #f3f4f8;
+}
+
+.manager-section .table-scroll::-webkit-scrollbar-track {
+    background: #f3f4f8;
+}
+
+/* Swap History search retains the original dashboard appearance. */
+.swap-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 13px 22px;
+    border-bottom: 1px solid var(--line);
+}
+
+.swap-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+#swapHistorySearch {
+    width: 100%;
+    height: 42px;
+    padding: 0 49px 0 13px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    outline: none;
+    font-size: 13px;
+    color: var(--ink);
+}
+
+    #swapHistorySearch:focus {
+        border-color: var(--amber);
+        box-shadow: 0 0 0 3px rgba(242,153,74,.12);
+    }
+
+    #swapHistorySearch::-webkit-search-cancel-button {
+        display: none;
+    }
+
+.swap-search-clear {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 21px;
+    cursor: pointer;
+}
+
+    .swap-search-clear:hover {
+        background: var(--amber-soft);
+        color: #c36612;
+    }
+
+.swap-result-count {
+    font-size: 12px;
+    color: var(--ink-faint);
+    white-space: nowrap;
+}
+
+.manager-empty-row {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--ink-faint);
+}
+
+@media (max-width: 800px) {
+    .swap-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .swap-result-count {
+        align-self: flex-start;
+    }
+
+    .manager-section .section-card .table-scroll {
+        max-height: 55vh;
+    }
+}

@@ -10,28 +10,28 @@ public static class DemoDataSeeder
         AppDbContext db)
     {
         // =====================================================
-        // DEPARTMENT / TEAM
+        // Team / TEAM
         // =====================================================
 
-        var department =
-            await db.Departments
+        var Team =
+            await db.Teams
                 .FirstOrDefaultAsync(x =>
                     x.Name ==
-                    DemoIdentity.DepartmentName);
+                    DemoIdentity.TeamName);
 
 
-        if (department == null)
+        if (Team == null)
         {
-            department =
-                new Department
+            Team =
+                new Team
                 {
                     Name =
-                        DemoIdentity.DepartmentName
+                        DemoIdentity.TeamName
                 };
 
 
-            db.Departments.Add(
-                department);
+            db.Teams.Add(
+                Team);
 
 
             await db.SaveChangesAsync();
@@ -66,8 +66,8 @@ public static class DemoDataSeeder
                     SchedulePrivilege =
                         true,
 
-                    DepartmentId =
-                        department.Id
+                    TeamId =
+                        Team.Id
                 };
 
 
@@ -85,8 +85,8 @@ public static class DemoDataSeeder
             manager.SchedulePrivilege =
                 true;
 
-            manager.DepartmentId =
-                department.Id;
+            manager.TeamId =
+                Team.Id;
         }
 
 
@@ -118,8 +118,8 @@ public static class DemoDataSeeder
                     SchedulePrivilege =
                         false,
 
-                    DepartmentId =
-                        department.Id
+                    TeamId =
+                        Team.Id
                 };
 
 
@@ -155,8 +155,8 @@ public static class DemoDataSeeder
                     SchedulePrivilege =
                         false,
 
-                    DepartmentId =
-                        department.Id
+                    TeamId =
+                        Team.Id
                 };
 
 
@@ -192,8 +192,8 @@ public static class DemoDataSeeder
                     SchedulePrivilege =
                         false,
 
-                    DepartmentId =
-                        department.Id
+                    TeamId =
+                        Team.Id
                 };
 
 
@@ -224,8 +224,8 @@ public static class DemoDataSeeder
         var scheduleExists =
             await db.OnCallSchedules
                 .AnyAsync(x =>
-                    x.DepartmentId ==
-                        department.Id
+                    x.TeamId ==
+                        Team.Id
                     &&
                     x.Date ==
                         testDate);
@@ -236,8 +236,8 @@ public static class DemoDataSeeder
             db.OnCallSchedules.Add(
                 new OnCallSchedule
                 {
-                    DepartmentId =
-                        department.Id,
+                    TeamId =
+                        Team.Id,
 
                     Date =
                         testDate,

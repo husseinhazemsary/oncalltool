@@ -33,7 +33,7 @@ namespace oncalltool.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DepartmentId")
+                    b.Property<int>("TeamId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Email")
@@ -58,13 +58,13 @@ namespace oncalltool.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DepartmentId", "Name")
+                    b.HasIndex("TeamId", "Name")
                         .IsUnique();
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("oncalltool.Backend.Common.Models.Department", b =>
+            modelBuilder.Entity("oncalltool.Backend.Common.Models.Team", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -81,7 +81,7 @@ namespace oncalltool.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Departments");
+                    b.ToTable("Teams");
                 });
 
             modelBuilder.Entity("oncalltool.Backend.Common.Models.OnCallSchedule", b =>
@@ -101,7 +101,7 @@ namespace oncalltool.Migrations
                     b.Property<string>("DayType")
                         .HasColumnType("text");
 
-                    b.Property<int>("DepartmentId")
+                    b.Property<int>("TeamId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ImpactedPlatforms")
@@ -134,7 +134,7 @@ namespace oncalltool.Migrations
 
                     b.HasIndex("SecondaryEmployeeId");
 
-                    b.HasIndex("DepartmentId", "Date")
+                    b.HasIndex("TeamId", "Date")
                         .IsUnique();
 
                     b.ToTable("OnCallSchedules");
@@ -142,20 +142,20 @@ namespace oncalltool.Migrations
 
             modelBuilder.Entity("oncalltool.Backend.Common.Models.AppUser", b =>
                 {
-                    b.HasOne("oncalltool.Backend.Common.Models.Department", "Department")
+                    b.HasOne("oncalltool.Backend.Common.Models.Team", "Team")
                         .WithMany("Users")
-                        .HasForeignKey("DepartmentId")
+                        .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Department");
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("oncalltool.Backend.Common.Models.OnCallSchedule", b =>
                 {
-                    b.HasOne("oncalltool.Backend.Common.Models.Department", "Department")
+                    b.HasOne("oncalltool.Backend.Common.Models.Team", "Team")
                         .WithMany("OnCallSchedules")
-                        .HasForeignKey("DepartmentId")
+                        .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -169,14 +169,14 @@ namespace oncalltool.Migrations
                         .HasForeignKey("SecondaryEmployeeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Department");
+                    b.Navigation("Team");
 
                     b.Navigation("PrimaryEmployee");
 
                     b.Navigation("SecondaryEmployee");
                 });
 
-            modelBuilder.Entity("oncalltool.Backend.Common.Models.Department", b =>
+            modelBuilder.Entity("oncalltool.Backend.Common.Models.Team", b =>
                 {
                     b.Navigation("OnCallSchedules");
 

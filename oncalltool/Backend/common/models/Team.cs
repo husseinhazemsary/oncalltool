@@ -1,6 +1,6 @@
 ﻿namespace oncalltool.Backend.Common.Models;
 
-public class Department
+public class Team
 {
     public int Id { get; set; }
 

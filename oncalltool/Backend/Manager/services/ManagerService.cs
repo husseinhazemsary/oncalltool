@@ -1,4 +1,5 @@
-﻿
+﻿using ClosedXML.Excel;
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using oncalltool.Backend.Common.Data;
 using oncalltool.Backend.Common.Models;
@@ -25,7 +26,7 @@ public class ManagerService
         string employeeId)
     {
         var user = await _db.Users
-            .Include(x => x.Department)
+            .Include(x => x.Team)
             .FirstOrDefaultAsync(x =>
                 x.EmployeeId == employeeId);
 
@@ -58,7 +59,7 @@ public class ManagerService
         string employeeId)
     {
         var user = await _db.Users
-            .Include(x => x.Department)
+            .Include(x => x.Team)
             .FirstOrDefaultAsync(x =>
                 x.EmployeeId == employeeId);
 
@@ -101,14 +102,14 @@ public class ManagerService
         // Count Manager + Employees, but NOT Admin.
         var teamMemberCount = await _db.Users
             .CountAsync(x =>
-                x.DepartmentId == editor.DepartmentId
+                x.TeamId == editor.TeamId
                 &&
                 x.Role != "Admin");
 
         // Count only regular employees with scheduling privilege.
         var scheduleEditors = await _db.Users
             .CountAsync(x =>
-                x.DepartmentId == editor.DepartmentId
+                x.TeamId == editor.TeamId
                 &&
                 x.Role == "Employee"
                 &&
@@ -120,14 +121,14 @@ public class ManagerService
             .Include(x => x.PrimaryEmployee)
             .Include(x => x.SecondaryEmployee)
             .FirstOrDefaultAsync(x =>
-                x.DepartmentId == editor.DepartmentId
+                x.TeamId == editor.TeamId
                 &&
                 x.Date.Date == today.Date);
 
         return new ManagerDashboardDto
         {
-            DepartmentName =
-                editor.Department?.Name ?? "",
+            TeamName =
+                editor.Team?.Name ?? "",
 
             TeamMemberCount =
                 teamMemberCount,
@@ -146,7 +147,7 @@ public class ManagerService
     // =========================================================
     // GET MY TEAM
     //
-    // Only members of the Manager's department.
+    // Only members of the Manager's team.
     // Admin is excluded.
     // =========================================================
 
@@ -158,7 +159,7 @@ public class ManagerService
 
         return await _db.Users
             .Where(x =>
-                x.DepartmentId == editor.DepartmentId
+                x.TeamId == editor.TeamId
                 &&
                 x.Role != "Admin")
 
@@ -206,7 +207,7 @@ public class ManagerService
 
         return await _db.OnCallSchedules
             .Where(x =>
-                x.DepartmentId == editor.DepartmentId)
+                x.TeamId == editor.TeamId)
 
             .Include(x => x.PrimaryEmployee)
             .Include(x => x.SecondaryEmployee)
@@ -260,7 +261,7 @@ public class ManagerService
     // CREATE ON-CALL
     //
     // Primary and Secondary must:
-    // - Belong to the same department
+    // - Belong to the same team
     // - Have Role == Employee
     // - Be different employees
     //
@@ -302,13 +303,20 @@ public class ManagerService
                 "Primary and Secondary employees must be different.");
         }
 
+        var normalizedDayType = NormalizeDayType(dto.DayType);
+        if (normalizedDayType == null)
+        {
+            throw new ArgumentException(
+                "Choose Day Type: Holiday (24 hours) or Weekday (16 hours).");
+        }
+
         // -----------------------------------------------------
         // VALIDATE EMPLOYEES
         // -----------------------------------------------------
 
         var employees = await _db.Users
             .Where(x =>
-                x.DepartmentId == editor.DepartmentId
+                x.TeamId == editor.TeamId
                 &&
                 x.Role == "Employee"
                 &&
@@ -323,7 +331,7 @@ public class ManagerService
         if (employees.Count != 2)
         {
             throw new ArgumentException(
-                "Primary and Secondary must be regular employees from your department. Managers and Admins cannot be assigned to on-call.");
+                "Primary and Secondary must be regular employees from your team. Managers and Admins cannot be assigned to on-call.");
         }
 
         var date = dto.Date.Date;
@@ -334,7 +342,7 @@ public class ManagerService
 
         var exists = await _db.OnCallSchedules
             .AnyAsync(x =>
-                x.DepartmentId == editor.DepartmentId
+                x.TeamId == editor.TeamId
                 &&
                 x.Date.Date == date);
 
@@ -350,8 +358,8 @@ public class ManagerService
 
         var schedule = new OnCallSchedule
         {
-            DepartmentId =
-                editor.DepartmentId,
+            TeamId =
+                editor.TeamId,
 
             Date =
                 date,
@@ -360,7 +368,9 @@ public class ManagerService
                 dto.PrimaryEmployeeId,
 
             SecondaryEmployeeId =
-                dto.SecondaryEmployeeId
+                dto.SecondaryEmployeeId,
+
+            DayType = normalizedDayType
         };
 
         _db.OnCallSchedules.Add(schedule);
@@ -373,7 +383,7 @@ public class ManagerService
     // =========================================================
     // UPDATE ON-CALL
     //
-    // Only regular employees from this department
+    // Only regular employees from this     
     // can be Primary or Secondary.
     // =========================================================
 
@@ -389,7 +399,7 @@ public class ManagerService
             .FirstOrDefaultAsync(x =>
                 x.Id == scheduleId
                 &&
-                x.DepartmentId == editor.DepartmentId);
+                x.TeamId == editor.TeamId);
 
         if (schedule == null)
         {
@@ -425,13 +435,20 @@ public class ManagerService
                 "Primary and Secondary employees must be different.");
         }
 
+        var normalizedDayType = NormalizeDayType(dto.DayType);
+        if (normalizedDayType == null)
+        {
+            throw new ArgumentException(
+                "Choose Day Type: Holiday (24 hours) or Weekday (16 hours).");
+        }
+
         // -----------------------------------------------------
         // VALIDATE EMPLOYEES
         // -----------------------------------------------------
 
         var validEmployeeCount = await _db.Users
             .CountAsync(x =>
-                x.DepartmentId == editor.DepartmentId
+                x.TeamId == editor.TeamId
                 &&
                 x.Role == "Employee"
                 &&
@@ -444,7 +461,7 @@ public class ManagerService
         if (validEmployeeCount != 2)
         {
             throw new ArgumentException(
-                "Primary and Secondary must be regular employees from your department. Managers and Admins cannot be assigned to on-call.");
+                "Primary and Secondary must be regular employees from your  team. Managers and Admins cannot be assigned to on-call.");
         }
 
         var newDate = dto.Date.Date;
@@ -455,7 +472,7 @@ public class ManagerService
 
         var duplicateDate = await _db.OnCallSchedules
             .AnyAsync(x =>
-                x.DepartmentId == editor.DepartmentId
+                x.TeamId == editor.TeamId
                 &&
                 x.Date.Date == newDate
                 &&
@@ -480,6 +497,8 @@ public class ManagerService
         schedule.SecondaryEmployeeId =
             dto.SecondaryEmployeeId;
 
+        schedule.DayType = normalizedDayType;
+
         await _db.SaveChangesAsync();
 
         return await GetOnCallByIdAsync(schedule.Id);
@@ -488,7 +507,7 @@ public class ManagerService
     // =========================================================
     // DELETE ON-CALL
     //
-    // Only schedules from the current department.
+    // Only schedules from the current Team.
     // =========================================================
 
     public async Task DeleteOnCallAsync(
@@ -502,7 +521,7 @@ public class ManagerService
             .FirstOrDefaultAsync(x =>
                 x.Id == scheduleId
                 &&
-                x.DepartmentId == editor.DepartmentId);
+                x.TeamId == editor.TeamId);
 
         if (schedule == null)
         {
@@ -534,12 +553,12 @@ public class ManagerService
             .FirstOrDefaultAsync(x =>
                 x.Id == employeeId
                 &&
-                x.DepartmentId == manager.DepartmentId);
+                x.TeamId == manager.TeamId);
 
         if (employee == null)
         {
             throw new KeyNotFoundException(
-                "Employee was not found in your department.");
+                "Employee was not found in your Team.");
         }
 
         // Prevent privilege changes for Manager or Admin.
@@ -620,4 +639,178 @@ public class ManagerService
                 schedule.IncidentDescription
         };
     }
+
+
+    // =========================================================
+    // EXPORT PREVIOUS MONTH: matches the uploaded August sheet:
+    // Day Type | Date | employee assignment columns | Hours/Day
+    // | employee hours columns | Total Hours | Total Oncalls.
+    // Both 1st and 2nd on-call count, exactly like its formulas.
+    // =========================================================
+    private static string? NormalizeDayType(string? value)
+    {
+        var text = value?.Trim().ToLowerInvariant();
+        if (string.IsNullOrWhiteSpace(text)) return null;
+        if (text == "holiday" || text == "weekend" ||
+            text == "public holiday" || text == "off day") return "Holiday";
+        if (text == "weekday" || text == "working day" ||
+            text == "workday") return "Weekday";
+        return null;
+    }
+
+    public async Task<(byte[] Content, string FileName)> ExportPreviousMonthAsync(
+        string managerEmployeeId)
+    {
+        // This authorization also scopes the query to the editor's own team.
+        var editor = await GetScheduleEditorAsync(managerEmployeeId);
+        var cairo = TimeZoneInfo.FindSystemTimeZoneById("Africa/Cairo");
+        var cairoToday = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, cairo).Date;
+        var firstThisMonth = new DateTime(cairoToday.Year, cairoToday.Month, 1);
+        var firstLastMonth = firstThisMonth.AddMonths(-1);
+        var days = DateTime.DaysInMonth(firstLastMonth.Year, firstLastMonth.Month);
+
+        var assignments = await _db.OnCallSchedules
+            .AsNoTracking()
+            .Where(s => s.TeamId == editor.TeamId &&
+                s.Date >= firstLastMonth && s.Date < firstThisMonth)
+            .OrderBy(s => s.Date)
+            .ToListAsync();
+
+        if (assignments.Count == 0)
+            throw new ArgumentException("No schedules exist for the previous month.");
+
+        // Do not silently treat a missing day type as a Weekday and mispay hours.
+        var invalid = assignments
+            .Where(s => NormalizeDayType(s.DayType) == null)
+            .Select(s => s.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))
+            .ToList();
+        if (invalid.Count > 0)
+            throw new ArgumentException(
+                "Set Holiday/Weekday on these schedules before exporting: " +
+                string.Join(", ", invalid));
+
+        var people = await _db.Users.AsNoTracking()
+            .Where(u => u.TeamId == editor.TeamId && u.Role == "Employee")
+            .OrderBy(u => u.Name)
+            .ToListAsync();
+        if (people.Count == 0)
+            throw new ArgumentException("This team has no eligible employees to export.");
+
+        // Avoid silently losing credited hours if a historical assignment
+        // references a deleted/moved person or a non-Employee role.
+        var eligibleIds = people.Select(person => person.Id).ToHashSet();
+        var unsupportedAssignments = assignments
+            .Where(s => (s.PrimaryEmployeeId.HasValue && !eligibleIds.Contains(s.PrimaryEmployeeId.Value)) ||
+                        (s.SecondaryEmployeeId.HasValue && !eligibleIds.Contains(s.SecondaryEmployeeId.Value)))
+            .Select(s => s.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))
+            .ToList();
+        if (unsupportedAssignments.Count > 0)
+            throw new ArgumentException("Some historical assignments reference people outside the current employee list: " +
+                string.Join(", ", unsupportedAssignments) + ". Review those records before exporting.");
+
+        // This format needs one assignment cell per employee per date.
+        // The database already enforces one schedule per team/day.
+        var daySchedules = assignments.ToDictionary(s => s.Date.Date);
+        var firstEmployeeColumn = 3;
+        var hoursPerDayColumn = firstEmployeeColumn + people.Count;
+        var firstHoursColumn = hoursPerDayColumn + 1;
+        var lastColumn = firstHoursColumn + people.Count - 1;
+        var endDataRow = days + 1;
+        var totalHoursRow = endDataRow + 1;
+        var totalOncallsRow = endDataRow + 2;
+
+        using var workbook = new XLWorkbook();
+        var sheet = workbook.Worksheets.Add(firstLastMonth.ToString("MMM yyyy", CultureInfo.InvariantCulture));
+        sheet.Cell(1, 1).Value = "";
+        sheet.Cell(1, 2).Value = "";
+        sheet.Cell(1, hoursPerDayColumn).Value = "Hours/Day";
+
+        for (var i = 0; i < people.Count; i++)
+        {
+            sheet.Cell(1, firstEmployeeColumn + i).Value = people[i].Name;
+            sheet.Cell(1, firstHoursColumn + i).Value = people[i].Name + " Hours";
+        }
+
+        for (var day = 1; day <= days; day++)
+        {
+            var date = new DateTime(firstLastMonth.Year, firstLastMonth.Month, day);
+            var row = day + 1;
+            daySchedules.TryGetValue(date, out var schedule);
+            // Missing schedule rows have no hours and follow Egypt's Fri/Sat
+            // weekend default for display. Special public holidays must come
+            // from a schedule's explicit DayType.
+            var dayType = schedule != null
+                ? NormalizeDayType(schedule.DayType)!
+                : date.DayOfWeek == DayOfWeek.Friday || date.DayOfWeek == DayOfWeek.Saturday
+                    ? "Holiday" : "Weekday";
+
+            sheet.Cell(row, 1).Value = dayType;
+            sheet.Cell(row, 2).Value = date;
+            sheet.Cell(row, 2).Style.DateFormat.Format = "d-mmm-yy";
+            sheet.Cell(row, hoursPerDayColumn).FormulaA1 =
+                $"IF(A{row}=\"Holiday\",24,16)";
+
+            if (dayType == "Holiday")
+                sheet.Cell(row, 1).Style.Fill.BackgroundColor = XLColor.FromHtml("#29B6E6");
+
+            for (var i = 0; i < people.Count; i++)
+            {
+                var person = people[i];
+                var assignment = schedule?.PrimaryEmployeeId == person.Id ? "1st Oncall" :
+                    schedule?.SecondaryEmployeeId == person.Id ? "2nd Oncall" : "";
+                var assignmentCell = sheet.Cell(row, firstEmployeeColumn + i);
+                assignmentCell.Value = assignment;
+                if (assignment.Length > 0)
+                    assignmentCell.Style.Fill.BackgroundColor = XLColor.FromHtml("#12A857");
+
+                var assignmentLetter = assignmentCell.Address.ColumnLetter;
+                var hoursCell = sheet.Cell(row, firstHoursColumn + i);
+                var hoursPerDayLetter = sheet.Cell(row, hoursPerDayColumn).Address.ColumnLetter;
+                hoursCell.FormulaA1 =
+                    $"IF(OR({assignmentLetter}{row}=\"1st Oncall\",{assignmentLetter}{row}=\"2nd Oncall\"),{hoursPerDayLetter}{row},0)";
+            }
+        }
+
+        sheet.Cell(totalHoursRow, 1).Value = "Total Hours";
+        sheet.Cell(totalOncallsRow, 1).Value = "Total Oncalls";
+        for (var i = 0; i < people.Count; i++)
+        {
+            var assignmentLetter = sheet.Cell(1, firstEmployeeColumn + i).Address.ColumnLetter;
+            var hoursLetter = sheet.Cell(1, firstHoursColumn + i).Address.ColumnLetter;
+            sheet.Cell(totalHoursRow, firstHoursColumn + i).FormulaA1 =
+                $"SUM({hoursLetter}2:{hoursLetter}{endDataRow})";
+            sheet.Cell(totalOncallsRow, firstHoursColumn + i).FormulaA1 =
+                $"COUNTIF({assignmentLetter}2:{assignmentLetter}{endDataRow},\"1st Oncall\")+" +
+                $"COUNTIF({assignmentLetter}2:{assignmentLetter}{endDataRow},\"2nd Oncall\")";
+        }
+
+        var used = sheet.Range(1, 1, totalOncallsRow, lastColumn);
+        used.Style.Font.FontName = "Arial";
+        used.Style.Font.FontSize = 10;
+        used.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        used.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+        used.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+        sheet.Row(1).Style.Font.Bold = true;
+        sheet.Row(totalHoursRow).Style.Font.Bold = true;
+        sheet.Row(totalOncallsRow).Style.Font.Bold = true;
+        sheet.Row(totalHoursRow).Style.Fill.BackgroundColor = XLColor.FromHtml("#E1F6EC");
+        sheet.Row(totalOncallsRow).Style.Fill.BackgroundColor = XLColor.FromHtml("#FFF1DB");
+        sheet.Column(1).Width = 16;
+        sheet.Column(2).Width = 17;
+        for (var i = 0; i < people.Count; i++)
+        {
+            sheet.Column(firstEmployeeColumn + i).Width = 20;
+            sheet.Column(firstHoursColumn + i).Width = 20;
+        }
+        sheet.Column(hoursPerDayColumn).Width = 15;
+        sheet.SheetView.FreezeRows(1);
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        var safeName = System.Text.RegularExpressions.Regex.Replace(
+            editor.Team?.Name ?? "Team", "[^a-zA-Z0-9_-]+", "_");
+        var fileName = $"{safeName}_{firstLastMonth:yyyy-MM}_OnCall.xlsx";
+        return (stream.ToArray(), fileName);
+    }
+
 }

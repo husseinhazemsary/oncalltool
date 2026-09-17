@@ -16,8 +16,8 @@ public class AppDbContext : DbContext
         Set<AppUser>();
 
 
-    public DbSet<Department> Departments =>
-        Set<Department>();
+    public DbSet<Team> Teams =>
+        Set<Team>();
 
 
     public DbSet<OnCallSchedule> OnCallSchedules =>
@@ -30,27 +30,27 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
 
-        // Department name must be unique
-        modelBuilder.Entity<Department>()
+        // Team name must be unique
+        modelBuilder.Entity<Team>()
             .HasIndex(x => x.Name)
             .IsUnique();
 
 
-        // Employee should be unique inside department
+        // Employee should be unique inside Team
         modelBuilder.Entity<AppUser>()
             .HasIndex(x => new
             {
-                x.DepartmentId,
+                x.TeamId,
                 x.Name
             })
             .IsUnique();
 
 
-        // User belongs to department
+        // User belongs to Team
         modelBuilder.Entity<AppUser>()
-            .HasOne(x => x.Department)
+            .HasOne(x => x.Team)
             .WithMany(x => x.Users)
-            .HasForeignKey(x => x.DepartmentId)
+            .HasForeignKey(x => x.TeamId)
             .OnDelete(DeleteBehavior.Restrict);
 
 
@@ -60,20 +60,20 @@ public class AppDbContext : DbContext
             .HasColumnType("date");
 
 
-        // Only one schedule per department/date
+        // Only one schedule per Team/date
         modelBuilder.Entity<OnCallSchedule>()
             .HasIndex(x => new
             {
-                x.DepartmentId,
+                x.TeamId,
                 x.Date
             })
             .IsUnique();
 
 
         modelBuilder.Entity<OnCallSchedule>()
-            .HasOne(x => x.Department)
+            .HasOne(x => x.Team)
             .WithMany(x => x.OnCallSchedules)
-            .HasForeignKey(x => x.DepartmentId)
+            .HasForeignKey(x => x.TeamId)
             .OnDelete(DeleteBehavior.Restrict);
 
 

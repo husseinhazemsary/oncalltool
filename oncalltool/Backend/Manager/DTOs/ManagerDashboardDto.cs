@@ -2,7 +2,7 @@
 
 public class ManagerDashboardDto
 {
-    public string DepartmentName { get; set; } = string.Empty;
+    public string TeamName { get; set; } = string.Empty;
 
     public int TeamMemberCount { get; set; }
 

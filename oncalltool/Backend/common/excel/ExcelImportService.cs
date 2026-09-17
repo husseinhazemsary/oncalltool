@@ -65,8 +65,8 @@ public class ExcelImportService
     {
         // Change this to ERP Applications if this sheet
         // actually represents ERP Applications in your company.
-        var department =
-            await GetOrCreateDepartmentAsync(
+        var Team =
+            await GetOrCreateTeamAsync(
                 "Enterprise RA");
 
 
@@ -147,19 +147,19 @@ public class ExcelImportService
 
             var primary =
                 await GetOrCreateEmployeeAsync(
-                    department,
+                    Team,
                     primaryName);
 
 
             var secondary =
                 await GetOrCreateEmployeeAsync(
-                    department,
+                    Team,
                     secondaryName);
 
 
             var schedule =
                 await GetOrCreateScheduleAsync(
-                    department.Id,
+                    Team.Id,
                     date);
 
 
@@ -200,8 +200,8 @@ public class ExcelImportService
     private async Task ImportDatabaseAsync(
         IXLWorksheet sheet)
     {
-        var department =
-            await GetOrCreateDepartmentAsync(
+        var Team =
+            await GetOrCreateTeamAsync(
                 "Database");
 
 
@@ -251,19 +251,19 @@ public class ExcelImportService
 
             var primary =
                 await GetOrCreateEmployeeAsync(
-                    department,
+                    Team,
                     primaryName);
 
 
             var secondary =
                 await GetOrCreateEmployeeAsync(
-                    department,
+                    Team,
                     secondaryName);
 
 
             var schedule =
                 await GetOrCreateScheduleAsync(
-                    department.Id,
+                    Team.Id,
                     date);
 
 
@@ -286,8 +286,8 @@ public class ExcelImportService
     private async Task ImportLinuxAsync(
         IXLWorksheet sheet)
     {
-        var department =
-            await GetOrCreateDepartmentAsync(
+        var Team =
+            await GetOrCreateTeamAsync(
                 "Linux");
 
 
@@ -331,7 +331,7 @@ public class ExcelImportService
 
             var primary =
                 await GetOrCreateEmployeeAsync(
-                    department,
+                    Team,
                     primaryName);
 
 
@@ -348,7 +348,7 @@ public class ExcelImportService
 
             var schedule =
                 await GetOrCreateScheduleAsync(
-                    department.Id,
+                    Team.Id,
                     date);
 
 
@@ -371,43 +371,43 @@ public class ExcelImportService
        HELPERS
        ========================================================== */
 
-    private async Task<Department>
-        GetOrCreateDepartmentAsync(
-            string departmentName)
+    private async Task<Team>
+        GetOrCreateTeamAsync(
+            string TeamName)
     {
-        var department =
-            await _db.Departments
+        var Team =
+            await _db.Teams
                 .FirstOrDefaultAsync(x =>
                     x.Name ==
-                    departmentName);
+                    TeamName);
 
 
-        if (department != null)
-            return department;
+        if (Team != null)
+            return Team;
 
 
-        department =
-            new Department
+        Team =
+            new Team
             {
                 Name =
-                    departmentName
+                    TeamName
             };
 
 
-        _db.Departments.Add(
-            department);
+        _db.Teams.Add(
+            Team);
 
 
         await _db.SaveChangesAsync();
 
 
-        return department;
+        return Team;
     }
 
 
     private async Task<AppUser?>
         GetOrCreateEmployeeAsync(
-            Department department,
+            Team Team,
             string name)
     {
         if (
@@ -423,8 +423,8 @@ public class ExcelImportService
         var employee =
             await _db.Users
                 .FirstOrDefaultAsync(x =>
-                    x.DepartmentId ==
-                        department.Id
+                    x.TeamId ==
+                        Team.Id
                     &&
                     x.Name ==
                         name);
@@ -440,8 +440,8 @@ public class ExcelImportService
                 Name =
                     name,
 
-                DepartmentId =
-                    department.Id,
+                TeamId =
+                    Team.Id,
 
                 Role =
                     "Employee",
@@ -464,14 +464,14 @@ public class ExcelImportService
 
     private async Task<OnCallSchedule>
         GetOrCreateScheduleAsync(
-            int departmentId,
+            int TeamId,
             DateTime date)
     {
         var schedule =
             await _db.OnCallSchedules
                 .FirstOrDefaultAsync(x =>
-                    x.DepartmentId ==
-                        departmentId
+                    x.TeamId ==
+                        TeamId
                     &&
                     x.Date ==
                         date.Date);
@@ -484,8 +484,8 @@ public class ExcelImportService
         schedule =
             new OnCallSchedule
             {
-                DepartmentId =
-                    departmentId,
+                TeamId =
+                    TeamId,
 
                 Date =
                     date.Date

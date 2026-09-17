@@ -1,40 +1,61 @@
 ﻿
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
     <title>On-Call — Admin</title>
 
-    <link rel="stylesheet" href="admin.css?v=1">
-    <script src="admin.js?v=1" defer></script>
+    <link rel="stylesheet" href="admin.css?v=20260917-24">
+
+    <script src="admin.js?v=20260917-24"
+            defer></script>
+
+
 </head>
+
 
 <body>
 
     <div class="app">
 
-        <!-- SIDEBAR -->
+
+        <!-- =========================================
+         SIDEBAR
+         ========================================= -->
+
         <aside class="sidebar">
 
             <div class="brand">
-                <div class="brand-mark">orange</div>
+
+                <div class="brand-mark">
+                    orange
+                </div>
 
                 <div>
                     <strong>On-Call</strong>
                     <small>ADMIN CONTROL ROOM</small>
                 </div>
+
             </div>
 
+
+            <!-- NAVIGATION -->
+
             <nav>
+
                 <button class="nav-item active"
                         data-view="overview">
                     ⌂ &nbsp; Overview
                 </button>
 
                 <button class="nav-item"
-                        data-view="departments">
-                    ▦ &nbsp; Departments
+                        data-view="Teams">
+                    ▦ &nbsp; Teams
                 </button>
 
                 <button class="nav-item"
@@ -46,20 +67,30 @@
                         data-view="roles">
                     ♢ &nbsp; Access & Roles
                 </button>
+
             </nav>
+
+
+            <!-- SIDEBAR FOOTER -->
 
             <div class="sidebar-bottom">
 
-                <a href="/index.html" class="back-link">
+                <a href="/index.html"
+                   class="back-link">
                     ← Switch dashboard
                 </a>
 
                 <div class="profile">
-                    <div class="avatar">H</div>
+
+                    <div class="avatar">
+                        H
+                    </div>
+
                     <div>
                         <strong>Hussein</strong>
                         <small>Organization Admin</small>
                     </div>
+
                 </div>
 
             </div>
@@ -67,146 +98,322 @@
         </aside>
 
 
-        <!-- MAIN -->
+
+        <!-- =========================================
+         MAIN CONTENT
+         ========================================= -->
+
         <main class="main">
 
+
+            <!-- TOP BAR -->
+
             <header class="topbar">
-                <span class="status">● Organization administration</span>
-                <span class="top-label">ADMIN CONTROL ROOM</span>
+
+                <span class="status">
+                    ● Organization administration
+                </span>
+
+                <span class="top-label">
+                    ADMIN CONTROL ROOM
+                </span>
+
             </header>
 
-            <div id="message" class="message" role="status" hidden></div>
+
+            <!-- MESSAGE -->
+
+            <div id="message"
+                 class="message"
+                 role="status"
+                 hidden>
+            </div>
 
 
-            <!-- OVERVIEW -->
-            <section id="overview" class="view">
+
+            <!-- =========================================
+             OVERVIEW
+             ========================================= -->
+
+            <section id="overview"
+                     class="view">
 
                 <div class="page-head">
+
                     <div>
-                        <p class="breadcrumb">Admin › Overview</p>
-                        <h1>Organization Overview</h1>
-                        <p>Manage departments, employees and manager access.</p>
+
+                        <p class="breadcrumb">
+                            Admin › Overview
+                        </p>
+
+                        <h1>
+                            Organization Overview
+                        </h1>
+
+                        <p>
+                            Manage teams, employees and manager access.
+                        </p>
+
                     </div>
+
                 </div>
+
+
+                <!-- STATISTICS -->
 
                 <div class="stats">
 
                     <div class="card">
-                        <span>Departments</span>
-                        <strong id="departmentCount">0</strong>
-                        <small>Teams across the organization</small>
+
+                        <span>Teams</span>
+
+                        <strong id="TeamCount">
+                            0
+                        </strong>
+
+                        <small>
+                            Teams across the organization
+                        </small>
+
                     </div>
+
 
                     <div class="card green">
+
                         <span>Employees</span>
-                        <strong id="employeeCount">0</strong>
-                        <small>Including managers</small>
+
+                        <strong id="employeeCount">
+                            0
+                        </strong>
+
+                        <small>
+                            Including managers
+                        </small>
+
                     </div>
+
 
                     <div class="card orange">
+
                         <span>Managers</span>
-                        <strong id="managerCount">0</strong>
-                        <small>With manager access</small>
+
+                        <strong id="managerCount">
+                            0
+                        </strong>
+
+                        <small>
+                            With manager access
+                        </small>
+
                     </div>
 
+
                     <div class="card">
+
                         <span>Needs a manager</span>
-                        <strong id="unassignedCount">0</strong>
-                        <small>Departments without a manager</small>
+
+                        <strong id="unassignedCount">
+                            0
+                        </strong>
+
+                        <small>
+                            Teams without a manager
+                        </small>
+
                     </div>
 
                 </div>
 
+
+                <!-- TEAM COVERAGE -->
+
                 <div class="panel">
+
                     <div class="panel-head">
+
                         <div>
-                            <h2>Department coverage</h2>
-                            <p>Current team structure and assigned managers</p>
+
+                            <h2>
+                                Team coverage
+                            </h2>
+
+                            <p>
+                                Current team structure and assigned managers
+                            </p>
+
                         </div>
+
                     </div>
 
-                    <div class="table-wrap">
+
+                    <div class="table-wrap table-scroll" tabindex="0" role="region" aria-label="Team coverage table">
+
                         <table>
+
                             <thead>
+
                                 <tr>
-                                    <th>Department</th>
+                                    <th>Team</th>
                                     <th>Employees</th>
                                     <th>Manager</th>
                                 </tr>
+
                             </thead>
-                            <tbody id="overviewBody"></tbody>
+
+                            <tbody id="overviewBody">
+                            </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
 
             </section>
 
 
-            <!-- DEPARTMENTS -->
-            <section id="departments" class="view" hidden>
+
+            <!-- =========================================
+             TEAMS
+             ========================================= -->
+
+            <section id="Teams"
+                     class="view"
+                     hidden>
+
 
                 <div class="page-head">
+
                     <div>
-                        <p class="breadcrumb">Admin › Departments</p>
-                        <h1>Departments</h1>
-                        <p>Create and manage teams.</p>
+
+                        <p class="breadcrumb">
+                            Admin › Teams
+                        </p>
+
+                        <h1>Teams</h1>
+
+                        <p>
+                            Create and manage teams.
+                        </p>
+
                     </div>
+
                 </div>
 
+
+                <!-- CREATE TEAM -->
+
                 <div class="panel">
+
                     <div class="panel-head">
-                        <h2>Create department</h2>
+                        <h2>Create Team</h2>
                     </div>
 
-                    <form id="departmentForm" class="form-row">
+
+                    <form id="TeamForm"
+                          class="form-row">
 
                         <label>
-                            Department name
-                            <input id="departmentName"
+
+                            Team name
+
+                            <input id="TeamName"
                                    placeholder="e.g. Network Operations"
                                    required>
+
                         </label>
 
-                        <button type="submit" class="btn-dark">
-                            + Create department
-                        </button>
 
+
+                        <div class="team-create-actions">
+
+                            <button type="submit"
+                                    id="createTeamAndAddBtn"
+                                    class="btn-orange">
+
+                                + Create Team
+
+                            </button>
+
+                        </div>
                     </form>
+
                 </div>
 
+
+
+                <!-- ALL TEAMS -->
+
                 <div class="panel">
+
                     <div class="panel-head">
-                        <h2>All departments</h2>
+                        <h2>All Teams</h2>
                     </div>
 
-                    <div class="table-wrap">
+
+                    <div class="table-wrap table-scroll" tabindex="0" role="region" aria-label="All teams table">
+
                         <table>
+
                             <thead>
+
                                 <tr>
-                                    <th>Department</th>
+                                    <th>Team</th>
                                     <th>Employees</th>
                                     <th>Manager</th>
                                     <th>Action</th>
                                 </tr>
+
                             </thead>
-                            <tbody id="departmentsBody"></tbody>
+
+
+                            <tbody id="TeamsBody">
+                            </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
 
             </section>
 
 
-            <!-- EMPLOYEES -->
-            <section id="employees" class="view" hidden>
+
+            <!-- =========================================
+             EMPLOYEES
+             ========================================= -->
+
+            <section id="employees"
+                     class="view"
+                     hidden>
+
+
+                <!-- PAGE HEADER -->
 
                 <div class="page-head">
+
                     <div>
-                        <p class="breadcrumb">Admin › Employees</p>
+
+                        <p class="breadcrumb">
+                            Admin › Employees
+                        </p>
+
                         <h1>Employees</h1>
-                        <p>Create, assign and manage employees.</p>
+
+                        <p>
+                            Create, assign and manage employees.
+                        </p>
+
                     </div>
+
                 </div>
+
+
+
+                <!-- =====================================
+                 CREATE EMPLOYEE
+                 ===================================== -->
 
                 <div class="panel">
 
@@ -214,109 +421,288 @@
                         <h2>Create employee</h2>
                     </div>
 
-                    <form id="employeeForm" class="employee-form">
+
+                    <form id="employeeForm"
+                          class="employee-form">
+
+
+                        <!-- EMPLOYEE ID -->
 
                         <label>
+
                             Employee ID
+
                             <input id="newEmployeeId"
                                    placeholder="EMP004"
                                    required>
+
                         </label>
 
+
+
+                        <!-- FULL NAME -->
+
                         <label>
+
                             Full name
+
                             <input id="newEmployeeName"
                                    placeholder="Employee name"
                                    required>
+
                         </label>
 
+
+
+                        <!-- EMAIL -->
+
                         <label>
+
                             Email
+
                             <input id="newEmployeeEmail"
                                    type="email"
                                    placeholder="Optional">
+
                         </label>
 
+
+
+                        <!-- PHONE -->
+
                         <label>
+
                             Phone
+
                             <input id="newEmployeePhone"
                                    placeholder="Optional">
+
                         </label>
+
+
+
+                        <!-- TEAM -->
 
                         <label>
-                            Department
-                            <select id="newEmployeeDepartment"
+
+                            Team
+
+                            <select id="newEmployeeTeam"
                                     required>
                             </select>
+
                         </label>
 
-                        <button type="submit" class="btn-dark">
+
+
+                        <!-- CREATE BUTTON -->
+
+                        <button type="submit"
+                                class="btn-dark">
+
                             + Create employee
+
                         </button>
+
 
                     </form>
 
                 </div>
 
+
+
+                <!-- =====================================
+                 ALL EMPLOYEES
+                 ===================================== -->
+
                 <div class="panel">
 
+
+                    <!-- PANEL HEADER -->
+
                     <div class="panel-head">
-                        <h2>All employees</h2>
+
+                        <h2>
+                            All employees
+                        </h2>
+
                     </div>
 
-                    <div class="table-wrap">
+
+
+                    <!-- SEARCH AND TEAM FILTER -->
+
+                    <div class="emp-toolbar">
+
+
+                        <div class="emp-search-box">
+
+                            <input type="search"
+                                   id="employeeSearch"
+                                   placeholder="Search by name, employee ID or team..."
+                                   aria-label="Search employees"
+                                   role="combobox"
+                                   aria-autocomplete="list"
+                                   aria-controls="employeeSuggestions"
+                                   aria-expanded="false"
+                                   autocomplete="off">
+
+                            <button type="button"
+                                    id="clearEmployeeSearchBtn"
+                                    class="emp-search-clear"
+                                    aria-label="Clear search"
+                                    hidden>
+                                ×
+                            </button>
+
+                            <!-- LIVE SEARCH SUGGESTIONS -->
+
+                            <div id="employeeSuggestions"
+                                 class="employee-suggestions"
+                                 role="listbox"
+                                 hidden>
+                            </div>
+
+                        </div>
+
+
+                        <select id="employeeTeamFilter"
+                                aria-label="Filter employees by team">
+
+                            <option value="">
+                                All teams
+                            </option>
+
+                        </select>
+
+
+                    </div>
+
+
+
+                    <!-- FILTER RESULTS -->
+
+                    <div class="emp-toolbar-footer">
+
+
+                        <span id="employeeFilterCount"
+                              role="status"
+                              aria-live="polite">
+
+                            Showing all employees
+
+                        </span>
+
+
+
+                        <button type="button"
+                                id="clearEmployeeFiltersBtn"
+                                hidden>
+
+                            Clear filters
+
+                        </button>
+
+
+                    </div>
+
+
+
+                    <!-- EMPLOYEE TABLE -->
+
+                    <div class="table-wrap table-scroll" tabindex="0" role="region" aria-label="All employees table">
 
                         <table>
+
+
                             <thead>
+
                                 <tr>
+
                                     <th>Employee</th>
+
                                     <th>Employee ID</th>
+
                                     <th>Role</th>
-                                    <th>Department</th>
+
+                                    <th>Team</th>
+
                                     <th>Action</th>
+
                                 </tr>
+
                             </thead>
 
-                            <tbody id="employeesBody"></tbody>
+
+
+                            <tbody id="employeesBody">
+                            </tbody>
+
 
                         </table>
 
                     </div>
 
+
                 </div>
+
 
             </section>
 
 
-            <!-- ACCESS AND ROLES -->
-            <section id="roles" class="view" hidden>
 
+            <!-- ACCESS & ROLES -->
+            <section id="roles" class="view" hidden>
                 <div class="page-head">
-                    <div>
-                        <p class="breadcrumb">Admin › Access & Roles</p>
-                        <h1>Access & Roles</h1>
-                        <p>Assign or remove the manager for each department.</p>
-                    </div>
+                    <p class="breadcrumb">Admin › Access & Roles</p>
+                    <h1>Access & Roles</h1>
+                    <p>Select a team, view its employees and manage manager access.</p>
                 </div>
 
                 <div class="panel">
-
                     <div class="panel-head">
                         <div>
-                            <h2>Department managers</h2>
-                            <p>Each department can have one manager.</p>
+                            <h2>Team managers</h2>
+                            <p>Each team can have one manager.</p>
                         </div>
                     </div>
 
-                    <div id="rolesBody"></div>
+                    <div class="roles-toolbar">
+                        <div class="role-search-box">
+                            <input id="roleSearch" type="search"
+                                   placeholder="Search team, employee name or ID..."
+                                   aria-label="Search teams and employees"
+                                   autocomplete="off">
+                            <button type="button" id="clearRoleSearchBtn"
+                                    class="role-search-clear"
+                                    aria-label="Clear search" hidden>
+                                ×
+                            </button>
+                        </div>
+                        <select id="roleTeamFilter" aria-label="Filter manager access by team">
+                            <option value="">All teams</option>
+                        </select>
+                    </div>
 
+                    <div class="roles-filter-info">
+                        <span id="roleFilterCount" role="status" aria-live="polite">
+                            Showing all teams
+                        </span>
+                        <button id="clearRoleFiltersBtn" type="button" hidden>
+                            Clear filters
+                        </button>
+                    </div>
+
+                    <div id="rolesBody" class="role-scroll" tabindex="0" role="region" aria-label="Team manager assignments"></div>
                 </div>
-
             </section>
 
         </main>
 
+
     </div>
 
+
 </body>
+
 </html>

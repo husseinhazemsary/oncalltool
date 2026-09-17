@@ -450,3 +450,542 @@ select {
         grid-template-columns: 1fr;
     }
 }
+/* =====================================
+   BALANCED ADMIN LAYOUT
+   Original design, slightly more compact
+   ===================================== */
+
+@media (min-width: 701px) {
+
+    /* Move content slightly upward */
+    .main {
+        padding: 24px 40px;
+    }
+
+    .topbar {
+        margin-bottom: 28px;
+    }
+
+    /* Page heading */
+    .page-head {
+        margin-bottom: 22px;
+    }
+
+    /* Statistics cards */
+    .stats {
+        gap: 18px;
+        margin-bottom: 26px;
+    }
+
+    .card {
+        min-height: 140px;
+        padding: 20px;
+    }
+
+        .card strong {
+            font-size: 33px;
+            margin: 10px 0 5px;
+        }
+
+    /* Team coverage */
+    .panel {
+        padding: 22px;
+        margin-bottom: 20px;
+    }
+
+    .panel-head {
+        margin-bottom: 16px;
+    }
+
+    th {
+        padding: 12px 14px;
+    }
+
+    td {
+        padding: 15px 14px;
+    }
+}
+
+/* =========================================
+   EMPLOYEE SEARCH TOOLBAR + AUTOCOMPLETE
+   One source of truth. Original page layout retained.
+   ========================================= */
+
+.emp-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 230px;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+    .emp-toolbar input,
+    .emp-toolbar select {
+        width: 100%;
+        min-width: 0;
+        height: 44px;
+        padding: 0 14px;
+        border: 1px solid #dfe3ee;
+        border-radius: 10px;
+        background: white;
+        color: var(--ink);
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+        .emp-toolbar input::placeholder {
+            color: var(--muted);
+        }
+
+        .emp-toolbar input:focus,
+        .emp-toolbar select:focus {
+            outline: none;
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(255, 121, 0, .10);
+        }
+
+.emp-toolbar-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 24px;
+    margin-bottom: 12px;
+}
+
+#employeeFilterCount {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+#clearEmployeeFiltersBtn {
+    border: 0;
+    background: transparent;
+    color: var(--orange);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+    #clearEmployeeFiltersBtn:hover {
+        text-decoration: underline;
+    }
+
+.employee-filter-empty {
+    padding: 28px 14px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.emp-search-box {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+}
+
+    .emp-search-box input {
+        width: 100%;
+        padding-right: 50px;
+    }
+
+        /* Replace tiny native cancel button with a 36px click target. */
+        .emp-search-box input::-webkit-search-cancel-button {
+            display: none;
+        }
+
+.emp-search-clear {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: #64748b;
+    font-size: 21px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+    .emp-search-clear:hover {
+        background: #fff3e8;
+        color: var(--orange);
+    }
+
+.employee-suggestions {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 270px;
+    overflow-y: auto;
+    padding: 5px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(23, 27, 41, .12);
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 11px 13px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+    .suggestion-item small {
+        color: var(--muted);
+        font-size: 11px;
+    }
+
+    .suggestion-item:hover,
+    .suggestion-item.active {
+        background: #fff3e8;
+        color: var(--orange);
+    }
+
+#employeeTeamFilter {
+    cursor: pointer;
+}
+
+@media (max-width: 850px) {
+    .emp-toolbar {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================
+   ACCESS & ROLES: SEARCH + TEAM VIEW
+   ========================================= */
+.roles-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 230px;
+    gap: 14px;
+    margin: 0 0 10px;
+}
+
+    .roles-toolbar input,
+    .roles-toolbar select {
+        width: 100%;
+        min-width: 0;
+        height: 44px;
+        padding: 0 14px;
+        border: 1px solid #dfe3ee;
+        border-radius: 10px;
+        background: #fff;
+        color: var(--ink);
+        font-size: 13px;
+    }
+
+        .roles-toolbar input:focus,
+        .roles-toolbar select:focus {
+            outline: none;
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(255, 121, 0, .10);
+        }
+
+#roleTeamFilter,
+.role-row select {
+    cursor: pointer;
+}
+
+.roles-filter-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 24px;
+    gap: 12px;
+    margin-bottom: 12px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+#clearRoleFiltersBtn {
+    border: 0;
+    background: transparent;
+    color: var(--orange);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+    #clearRoleFiltersBtn:hover {
+        text-decoration: underline;
+    }
+
+.role-team-info {
+    min-width: 0;
+}
+
+.role-current {
+    margin: 8px 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.role-members {
+    margin-top: 12px;
+}
+
+.role-members-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.role-member-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.role-member {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 5px 9px;
+    background: #eff0f5;
+    color: #596277;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+    .role-member small {
+        font-size: 10px;
+        font-weight: 400;
+    }
+
+.role-no-members {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.roles-empty {
+    padding: 30px 15px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.btn-dark:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+@media (max-width: 850px) {
+    .roles-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .role-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+/* =========================================
+   INDEPENDENT SCROLLING: ALL TABLES & ROLES
+   No fixed heights or stretched blank panels.
+   ========================================= */
+.table-wrap.table-scroll {
+    max-height: min(360px, 48vh);
+    overflow-y: auto;
+    overflow-x: auto;
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #bbc2d1 transparent;
+}
+
+.table-scroll thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #fff;
+    box-shadow: 0 1px 0 var(--line);
+}
+
+/* The filter/search bar stays outside this scroll area. */
+#rolesBody.role-scroll {
+    max-height: min(400px, 50vh);
+    overflow-y: auto;
+    overflow-x: auto;
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #bbc2d1 transparent;
+    padding-right: 6px;
+}
+
+.table-scroll::-webkit-scrollbar,
+.role-scroll::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb,
+.role-scroll::-webkit-scrollbar-thumb {
+    background: #bbc2d1;
+    border-radius: 12px;
+    border: 2px solid white;
+}
+
+.table-scroll::-webkit-scrollbar-track,
+.role-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-scroll:focus-visible,
+.role-scroll:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 2px;
+}
+
+/* New-team flow: two options without changing the existing form. */
+.team-create-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-orange {
+    border: 0;
+    background: var(--orange);
+    color: white;
+    border-radius: 10px;
+    padding: 13px 17px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+    .btn-orange:hover {
+        background: #e66d00;
+    }
+
+@media (max-width: 700px) {
+    .team-create-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .table-scroll.table-wrap {
+        max-height: 340px;
+    }
+
+    #rolesBody.role-scroll {
+        max-height: 380px;
+    }
+}
+
+/* Keep both team-creation actions comfortable on narrower desktop screens. */
+@media (min-width: 701px) and (max-width: 1120px) {
+    #TeamForm {
+        grid-template-columns: 1fr;
+    }
+
+    .team-create-actions {
+        justify-content: flex-start;
+    }
+}
+
+/* =========================================
+   ACCESS & ROLES — ACCESSIBLE SEARCH CLEAR
+   ========================================= */
+.role-search-box {
+    position: relative;
+    min-width: 0;
+    width: 100%;
+}
+
+    .role-search-box input {
+        width: 100%;
+        padding-right: 52px;
+    }
+
+#roleSearch::-webkit-search-cancel-button {
+    display: none;
+}
+
+.role-search-clear {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: #64748b;
+    font-size: 21px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+    .role-search-clear:hover,
+    .role-search-clear:focus-visible {
+        background: #fff3e8;
+        color: var(--orange);
+    }
+
+#roleTeamFilter {
+    cursor: pointer;
+}
+
+/* The two team tables scroll within their own panels. */
+#Teams .table-wrap.table-scroll,
+#overview .table-wrap.table-scroll {
+    max-height: 235px;
+    overflow-y: scroll;
+    overflow-x: auto;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: #9ca3af #f1f3f8;
+}
+
+#Teams .table-scroll thead th,
+#overview .table-scroll thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: white;
+    box-shadow: 0 1px 0 var(--line);
+}
+
+#Teams .table-scroll::-webkit-scrollbar,
+#overview .table-scroll::-webkit-scrollbar {
+    width: 10px;
+}
+
+#Teams .table-scroll::-webkit-scrollbar-track,  
+#overview .table-scroll::-webkit-scrollbar-track {
+    background: #f1f3f8;
+    border-radius: 10px;
+}
+
+#Teams .table-scroll::-webkit-scrollbar-thumb,
+#overview .table-scroll::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+    border: 2px solid #f1f3f8;
+    border-radius: 10px;
+}

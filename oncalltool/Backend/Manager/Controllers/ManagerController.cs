@@ -484,4 +484,33 @@ public class ManagerController : ControllerBase
                 });
         }
     }
+
+    // Previous calendar month, actual XLSX with Excel formulas.
+    // Current date is resolved in Africa/Cairo in ManagerService.
+    [HttpGet("oncalls/export-last-month")]
+    public async Task<IActionResult> ExportLastMonth(
+        [FromQuery] string managerEmployeeId)
+    {
+        try
+        {
+            var export = await _managerService.ExportPreviousMonthAsync(managerEmployeeId);
+            return File(export.Content,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                export.FileName);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
 }

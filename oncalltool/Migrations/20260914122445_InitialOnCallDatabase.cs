@@ -13,7 +13,7 @@ namespace oncalltool.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Departments",
+                name: "Teams",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -22,7 +22,7 @@ namespace oncalltool.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Departments", x => x.Id);
+                    table.PrimaryKey("PK_Teams", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -37,15 +37,15 @@ namespace oncalltool.Migrations
                     Email = table.Column<string>(type: "text", nullable: true),
                     Role = table.Column<string>(type: "text", nullable: false),
                     SchedulePrivilege = table.Column<bool>(type: "boolean", nullable: false),
-                    DepartmentId = table.Column<int>(type: "integer", nullable: false)
+                    TeamId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Departments_DepartmentId",
-                        column: x => x.DepartmentId,
-                        principalTable: "Departments",
+                        name: "FK_Users_Teams_TeamId",
+                        column: x => x.TeamId,
+                        principalTable: "Teams",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -57,7 +57,7 @@ namespace oncalltool.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Date = table.Column<DateTime>(type: "date", nullable: false),
-                    DepartmentId = table.Column<int>(type: "integer", nullable: false),
+                    TeamId = table.Column<int>(type: "integer", nullable: false),
                     PrimaryEmployeeId = table.Column<int>(type: "integer", nullable: true),
                     SecondaryEmployeeId = table.Column<int>(type: "integer", nullable: true),
                     DayType = table.Column<string>(type: "text", nullable: true),
@@ -73,9 +73,9 @@ namespace oncalltool.Migrations
                 {
                     table.PrimaryKey("PK_OnCallSchedules", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OnCallSchedules_Departments_DepartmentId",
-                        column: x => x.DepartmentId,
-                        principalTable: "Departments",
+                        name: "FK_OnCallSchedules_Teams_TeamId",
+                        column: x => x.TeamId,
+                        principalTable: "Teams",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -93,15 +93,15 @@ namespace oncalltool.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Departments_Name",
-                table: "Departments",
+                name: "IX_Teams_Name",
+                table: "Teams",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_OnCallSchedules_DepartmentId_Date",
+                name: "IX_OnCallSchedules_TeamId_Date",
                 table: "OnCallSchedules",
-                columns: new[] { "DepartmentId", "Date" },
+                columns: new[] { "TeamId", "Date" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -115,9 +115,9 @@ namespace oncalltool.Migrations
                 column: "SecondaryEmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_DepartmentId_Name",
+                name: "IX_Users_TeamId_Name",
                 table: "Users",
-                columns: new[] { "DepartmentId", "Name" },
+                columns: new[] { "TeamId", "Name" },
                 unique: true);
         }
 
@@ -131,7 +131,7 @@ namespace oncalltool.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Departments");
+                name: "Teams");
         }
     }
 }

@@ -32,6 +32,8 @@ let editingScheduleId = null;
 let scheduleFilter =
     "next7";
 
+let swapHistoryQuery = "";
+
 
 /* =========================================================
    API HELPER
@@ -459,7 +461,7 @@ function escapeHtml(
 
 
 /* =========================================================
-   MANAGER / DEPARTMENT HEADER
+   MANAGER / Team HEADER
    ========================================================= */
 
 function renderManagerInfo() {
@@ -472,28 +474,10 @@ function renderManagerInfo() {
         );
 
 
-    const departmentName =
-        dashboard?.departmentName
+    const teamName =
+        dashboard?.teamName
         ||
         "My Team";
-
-
-    const departmentTitle =
-        document.querySelector(
-            "#departmentTitle"
-        );
-
-
-    const departmentBreadcrumb =
-        document.querySelector(
-            "#departmentBreadcrumb"
-        );
-
-
-    const departmentContext =
-        document.querySelector(
-            "#departmentContext"
-        );
 
 
     const teamTitle =
@@ -502,44 +486,48 @@ function renderManagerInfo() {
         );
 
 
-    const modalDepartment =
+    const teamBreadcrumb =
         document.querySelector(
-            "#modalDepartment"
+            "#teamBreadcrumb"
         );
 
 
-    if (departmentTitle) {
+    const teamContext =
+        document.querySelector(
+            "#teamContext"
+        );
 
-        departmentTitle.textContent =
-            departmentName;
-    }
-
-
-    if (departmentBreadcrumb) {
-
-        departmentBreadcrumb.textContent =
-            departmentName;
-    }
-
-
-    if (departmentContext) {
-
-        departmentContext.textContent =
-            departmentName;
-    }
+    const modalTeam =
+        document.querySelector(
+            "#modalTeam"
+        );
 
 
     if (teamTitle) {
 
         teamTitle.textContent =
-            `${departmentName} Team`;
+            teamName;
     }
 
 
-    if (modalDepartment) {
+    if (teamBreadcrumb) {
 
-        modalDepartment.textContent =
-            departmentName.toUpperCase();
+        teamBreadcrumb.textContent =
+            teamName;
+    }
+
+
+    if (teamContext) {
+
+        teamContext.textContent =
+            teamName;
+    }
+
+
+    if (modalTeam) {
+
+        modalTeam.textContent =
+            teamName.toUpperCase();
     }
 
 
@@ -573,7 +561,7 @@ function renderManagerInfo() {
         if (managerRole) {
 
             managerRole.textContent =
-                `${departmentName} Manager`;
+                `${teamName} Manager`;
         }
 
 
@@ -662,7 +650,7 @@ function renderSchedules() {
 
     const body =
         document.querySelector(
-            "#myDepartmentBody"
+            "#myTeamBody"
         );
 
 
@@ -704,7 +692,7 @@ function renderSchedules() {
     }
 
 
-   
+
 
 
     const sortedSchedules =
@@ -1088,7 +1076,7 @@ function populateEmployeeSelects() {
     const availableEmployees =
         teamMembers.filter(
             employee =>
-                employee.role === "Employee"        );
+                employee.role === "Employee");
 
 
     availableEmployees.forEach(
@@ -1145,7 +1133,7 @@ function openCreateScheduleModal() {
     const availableEmployees =
         teamMembers.filter(
             employee =>
-                employee.role === "Employee"        );
+                employee.role === "Employee");
 
 
     if (availableEmployees.length < 2) {
@@ -1176,6 +1164,8 @@ function openCreateScheduleModal() {
     ).value =
         getTodayISO();
 
+
+    document.querySelector("#scheduleDayType").value = "";
 
     document.querySelector(
         "#scheduleModal"
@@ -1252,6 +1242,11 @@ function editSchedule(
             schedule.date
         );
 
+
+    document.querySelector("#scheduleDayType").value =
+        schedule.dayType === "Holiday" || schedule.dayType === "Weekday"
+            ? schedule.dayType
+            : "";
 
     document.querySelector(
         "#primarySelect"
@@ -1344,14 +1339,17 @@ async function saveSchedule() {
     }
 
 
+    const dayType = document.querySelector("#scheduleDayType").value;
+
+    if (dayType !== "Holiday" && dayType !== "Weekday") {
+        showToast("Choose Holiday or Weekday so monthly hours are accurate.");
+        return;
+    }
+
     const payload = {
-
-        date:
-
-            `${date}T00:00:00`,
-
+        date: `${date}T00:00:00`,
+        dayType,
         primaryEmployeeId,
-
         secondaryEmployeeId
     };
 
@@ -1620,177 +1618,131 @@ function renderIncidents() {
    SWAP HISTORY
    ========================================================= */
 
-function renderSwapHistory() {
+// SwapNote is currently free text, not a structured audit trail.
+// Show a partner ONLY when the note explicitly names a known team employee.
+// The secondary on-call employee is never assumed to be the swap partner.
 
-    const body =
-        document.querySelector(
-            "#swapHistoryBody"
+function getRecordedSwapPartner(schedule) {
+
+    const note = String(
+        schedule.swapNote ?? ""
+    ).trim();
+
+    if (!note) {
+        return "Not recorded";
+    }
+
+    // Supports:
+    // Swap with Esraa
+    // Swapped with John
+    // Replaced by Omar
+    // John -> Esraa
+
+    const match = note.match(
+        /(?:\bswap(?:ped)?\s+with|\breplaced\s+by)\s*:?\s*([^,;.!]+)|(?:->|→)\s*([^,;.!]+)/i
+    );
+
+    if (!match) {
+        return "Not recorded";
+    }
+
+    const recordedName = (
+        match[1] || match[2]
+    ).trim().toLowerCase();
+
+    // Find the actual employee in this team.
+
+    const partner = teamMembers.find(employee => {
+
+        if (employee.role !== "Employee") {
+            return false;
+        }
+
+        const name = String(
+            employee.name ?? ""
+        ).trim().toLowerCase();
+
+        const employeeId = String(
+            employee.employeeId ?? ""
+        ).trim().toLowerCase();
+
+        return (
+            name === recordedName ||
+            employeeId === recordedName
         );
 
+    });
 
-    if (!body) {
-        return;
+    if (!partner) {
+        return "Not recorded";
     }
 
-
-    const swaps =
-        schedules
-
-            .filter(
-                schedule =>
-
-                    schedule.swapNote
-                    &&
-                    schedule.swapNote
-                        .toString()
-                        .trim() !== ""
-            )
-
-            .sort(
-                (a, b) =>
-
-                    parseLocalDate(
-                        b.date
-                    )
-
-                    -
-
-                    parseLocalDate(
-                        a.date
-                    )
-            );
-
+    // If the note identifies the current primary,
+    // the historical partner cannot be established reliably.
 
     if (
-        swaps.length === 0
+        partner.id === schedule.primaryEmployeeId
     ) {
+        return "Not recorded";
+    }
 
-        body.innerHTML = `
+    return partner.name;
+}
+function renderSwapHistory() {
+    const body = document.querySelector("#swapHistoryBody");
+    if (!body) return;
 
-            <tr>
+    const allSwaps = schedules
+        .filter(schedule => String(schedule.swapNote ?? "").trim())
+        .sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date));
 
-                <td colspan="4"
-                    style="
-                        text-align:center;
-                        padding:35px;
-                        color:#8a93a5;
-                    ">
+    const query = swapHistoryQuery.trim().toLowerCase();
+    const visible = allSwaps.filter(schedule => {
+        const searchText = [
+            normalizeDate(schedule.date),
+            formatDate(schedule.date),
+            schedule.primaryName,
+            getRecordedSwapPartner(schedule),
+            schedule.swapNote
+        ].join(" ").toLowerCase();
+        return !query || searchText.includes(query);
+    });
 
-                    No swap history recorded.
+    document.querySelector("#swapHistoryCount").textContent =
+        `Showing ${visible.length} of ${allSwaps.length} swaps`;
+    document.querySelector("#clearSwapSearchBtn").hidden = !swapHistoryQuery;
 
-                </td>
-
-            </tr>
-
-        `;
-
+    if (!visible.length) {
+        body.innerHTML = `<tr><td colspan="4" class="manager-empty-row">${allSwaps.length ? "No swaps match your search." : "No swap history recorded."
+            }</td></tr>`;
         return;
     }
 
-
-    body.innerHTML =
-
-        swaps
-
-            .map(
-                schedule => `
-
-                    <tr>
-
-
-                        <td>
-
-                            <div class="cell-date">
-
-                                ${escapeHtml(
-                    formatDate(
-                        schedule.date
-                    )
-                )}
-
-                            </div>
-
-
-                            <div class="cell-day">
-
-                                ${escapeHtml(
-                    getDayName(
-                        schedule.date
-                    )
-                )}
-
-                            </div>
-
-                        </td>
-
-
-
-                        <td>
-
-                            <div class="who">
-
-                                <span class="dot p">
-                                </span>
-
-                                <span class="who-name">
-
-                                    ${escapeHtml(
-                    schedule.primaryName
-                    ||
-                    "Unassigned"
-                )}
-
-                                </span>
-
-                            </div>
-
-                        </td>
-
-
-
-                        <td>
-
-                            <div class="who">
-
-                                <span class="dot s">
-                                </span>
-
-                                <span class="who-name">
-
-                                    ${escapeHtml(
-                    schedule.secondaryName
-                    ||
-                    "Unassigned"
-                )}
-
-                                </span>
-
-                            </div>
-
-                        </td>
-
-
-
-                        <td>
-
-                            <span class="swap-note">
-
-                                ${escapeHtml(
-                    schedule.swapNote
-                )}
-
-                            </span>
-
-                        </td>
-
-
-                    </tr>
-
-                `
-            )
-
-            .join("");
+    body.innerHTML = visible.map(schedule => `
+        <tr>
+            <td>
+                <div class="cell-date">${escapeHtml(formatDate(schedule.date))}</div>
+                <div class="cell-day">${escapeHtml(getDayName(schedule.date))}</div>
+            </td>
+            <td>${escapeHtml(schedule.primaryName || "Unassigned")}</td>
+            <td>${escapeHtml(getRecordedSwapPartner(schedule))}</td>
+            <td><span class="swap-note">${escapeHtml(schedule.swapNote)}</span></td>
+        </tr>
+    `).join("");
 }
+
+// Swap search is client-side and preserves the current query on data refresh.
+document.querySelector("#swapHistorySearch").addEventListener("input", event => {
+    swapHistoryQuery = event.target.value;
+    renderSwapHistory();
+});
+
+document.querySelector("#clearSwapSearchBtn").addEventListener("click", () => {
+    swapHistoryQuery = "";
+    document.querySelector("#swapHistorySearch").value = "";
+    renderSwapHistory();
+    document.querySelector("#swapHistorySearch").focus();
+});
 
 /* =========================================================
    REFRESH ALL REAL MANAGER DATA
@@ -2529,6 +2481,55 @@ function exportIncidents() {
     );
 }
 
+
+/* =========================================================
+   EXPORT PREVIOUS CALENDAR MONTH AS REAL XLSX
+   Independent of Overview's Today / 7 Days / Next Month filter.
+   The server queries its own team-scoped data and generates formulas.
+   ========================================================= */
+async function exportLastMonthExcel() {
+    const button = document.querySelector("#exportLastMonthBtn");
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = "Preparing Excel...";
+
+    try {
+        const response = await fetch(
+            `/api/manager/oncalls/export-last-month?managerEmployeeId=${encodeURIComponent(managerEmployeeId)}`
+        );
+        if (!response.ok) {
+            const error = await response.json().catch(() => null);
+            throw new Error(error?.message || `Export failed (${response.status}).`);
+        }
+
+        const blob = await response.blob();
+        const disposition = response.headers.get("Content-Disposition") || "";
+        const filenameMatch = disposition.match(/filename\*?=(?:UTF-8''|\")?([^";]+)/i);
+        const filename = filenameMatch
+            ? decodeURIComponent(filenameMatch[1].replace(/^\"|\"$/g, ""))
+            : "OnCall_Last_Month.xlsx";
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast("Last month's Excel report is ready.");
+    }
+    catch (error) {
+        console.error(error);
+        showToast(error.message);
+    }
+    finally {
+        button.disabled = false;
+        button.textContent = originalText;
+    }
+}
+
+document.querySelector("#exportLastMonthBtn")
+    .addEventListener("click", exportLastMonthExcel);
 
 /* =========================================================
    EXPORT BUTTON EVENTS

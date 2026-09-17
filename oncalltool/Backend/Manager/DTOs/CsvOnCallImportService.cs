@@ -31,7 +31,7 @@ public class CsvOnCallImportService
     {
         var user =
             await _db.Users
-                .Include(x => x.Department)
+                .Include(x => x.Team)
                 .FirstOrDefaultAsync(x =>
                     x.EmployeeId == employeeId);
 
@@ -125,8 +125,8 @@ public class CsvOnCallImportService
             await _db.Users
 
                 .Where(x =>
-                    x.DepartmentId ==
-                        editor.DepartmentId
+                    x.TeamId ==
+                        editor.TeamId
                     &&
                     x.Role != "Manager")
 
@@ -155,8 +155,8 @@ public class CsvOnCallImportService
             await _db.OnCallSchedules
 
                 .Where(x =>
-                    x.DepartmentId ==
-                        editor.DepartmentId)
+                    x.TeamId ==
+                        editor.TeamId)
 
                 .ToDictionaryAsync(
                     x => x.Date.Date);
@@ -496,8 +496,8 @@ public class CsvOnCallImportService
                 var schedule =
                     new OnCallSchedule
                     {
-                        DepartmentId =
-                            editor.DepartmentId,
+                        TeamId =
+                            editor.TeamId,
 
                         Date =
                             date,
